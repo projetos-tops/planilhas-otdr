@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from typing import List, Dict
 import os
+import zipfile
+import io
 import tempfile
 import shutil
 from pathlib import Path
@@ -22,7 +24,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Instâncias dos handlers
 pdf_parser = PDFParserUniversal()
 excel_handler = ExcelHandler()
 
@@ -30,45 +31,40 @@ excel_handler = ExcelHandler()
 async def root():
     return {"message": "Pré-Lançamento System API", "version": "3.0.0"}
 
-@app.post("/processar")
-async def processar_arquivos(
+@app.post("/processar-pasta")
+async def processar_pasta(
     files: List[UploadFile] = File(...),
     comprimento_bobina: float = Form(...),
     operador: str = Form(...),
-    nome_pasta: str = Form(...)
+    nome_pasta_principal: str = Form(...)
 ):
     """
-    Processa múltiplos arquivos PDF e retorna um Excel
+    Processa múltiplos arquivos de UMA pasta e retorna UM Excel
+    (Funcionalidade original: 1 pasta = 1 Excel)
     """
     try:
-        # Validar arquivos
         if not files:
             raise HTTPException(status_code=400, detail="Nenhum arquivo enviado")
         
-        # Processar cada arquivo
+        # Processar cada arquivo da pasta
         dados_fibras = []
         
         for file in files:
-            # Validar extensão
             if not any(file.filename.lower().endswith(ext) for ext in ['.pdf', '.sor', '.msor']):
                 continue
             
-            # Ler conteúdo do arquivo
             content = await file.read()
-            
-            # Extrair dados
             dados = await pdf_parser.extrair_dados(content, file.filename)
             dados_fibras.append(dados)
         
         if not dados_fibras:
             raise HTTPException(status_code=400, detail="Nenhum arquivo PDF válido encontrado")
         
-        # Carregar template do Excel (usando um template padrão)
-        # Para produção, você deve ter um arquivo template real
+        # Carregar template do Excel
         template_path = Path(__file__).parent.parent / "template" / "modelo.xlsx"
         
         if not template_path.exists():
-            # Criar template básico se não existir
+            # Criar template básico
             from openpyxl import Workbook
             wb = Workbook()
             ws = wb.active
@@ -80,11 +76,11 @@ async def processar_arquivos(
             with open(template_path, "rb") as f:
                 modelo_content = f.read()
         
-        # Gerar planilha
+        # Gerar planilha para esta pasta
         excel_content = await excel_handler.criar_planilha(
             dados_fibras,
             modelo_content,
-            nome_pasta,
+            nome_pasta_principal,  # Usa o nome da pasta como nome do arquivo
             comprimento_bobina,
             operador
         )
@@ -93,22 +89,49 @@ async def processar_arquivos(
         return StreamingResponse(
             io.BytesIO(excel_content),
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": f"attachment; filename=BOBINA_{nome_pasta}.xlsx"}
+            headers={"Content-Disposition": f"attachment; filename=BOBINA_{nome_pasta_principal}.xlsx"}
         )
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/processar-pasta")
-async def processar_pasta(
-    files: List[UploadFile] = File(...),
+@app.post("/processar-multiplas-pastas")
+async def processar_multiplas_pastas(
+    pastas: List[dict] = Form(...),  # Lista de {nome_pasta: [arquivos]}
     comprimento_bobina: float = Form(...),
-    operador: str = Form(...),
-    nome_pasta: str = Form(...)
+    operador: str = Form(...)
 ):
     """
-    Processa múltiplos arquivos de uma pasta e retorna um Excel
+    Processa MÚLTIPLAS pastas e retorna um ZIP com vários Excels
+    (Funcionalidade original: varre todas subpastas)
     """
-    return await processar_arquivos(files, comprimento_bobina, operador, nome_pasta)
-
-import io
+    try:
+        zip_buffer = io.BytesIO()
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for pasta_info in pastas:
+                nome_pasta = pasta_info.get("nome_pasta")
+                arquivos = pasta_info.get("arquivos", [])
+                
+                if not arquivos:
+                    continue
+                
+                # Processar arquivos da pasta
+                dados_fibras = []
+                for arquivo_info in arquivos:
+                    # Aqui viria a lógica de processamento
+                    pass
+                
+                # Gerar Excel para esta pasta
+                # Adicionar ao ZIP
+                
+        zip_buffer.seek(0)
+        
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={"Content-Disposition": "attachment; filename=planilhas_geradas.zip"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

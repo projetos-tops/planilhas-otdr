@@ -1,12 +1,10 @@
 // frontend/script.js
-const API_URL = '/api'; // Para desenvolvimento local, use 'http://localhost:8000/api'
-
-let selectedFiles = [];
+let pastaSelecionada = null;
+let arquivosPorPasta = new Map();
 
 // Elementos DOM
-const dropArea = document.getElementById('dropArea');
-const fileInput = document.getElementById('files');
-const fileList = document.getElementById('fileList');
+const selectPastaBtn = document.getElementById('selectPastaBtn');
+const pastaInfo = document.getElementById('pastaInfo');
 const processarBtn = document.getElementById('processarBtn');
 const progressSection = document.getElementById('progressSection');
 const resultSection = document.getElementById('resultSection');
@@ -14,151 +12,174 @@ const progressBar = document.getElementById('progressBar');
 const progressStatus = document.getElementById('progressStatus');
 const resultMessage = document.getElementById('resultMessage');
 const downloadBtn = document.getElementById('downloadBtn');
+const subpastasList = document.getElementById('subpastasList');
 
-let excelBlob = null;
+let excelBlobs = [];
+let zipBlob = null;
 
-// Eventos de Drag & Drop
-dropArea.addEventListener('click', () => fileInput.click());
-dropArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropArea.classList.add('drag-over');
-});
-dropArea.addEventListener('dragleave', () => {
-    dropArea.classList.remove('drag-over');
-});
-dropArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropArea.classList.remove('drag-over');
-    const files = Array.from(e.dataTransfer.files);
-    handleFiles(files);
-});
-
-fileInput.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files);
-    handleFiles(files);
-});
-
-function handleFiles(files) {
-    const validFiles = files.filter(file => {
-        const ext = file.name.toLowerCase();
-        return ext.endsWith('.pdf') || ext.endsWith('.sor') || ext.endsWith('.msor');
-    });
+// Selecionar PASTA PRINCIPAL (não arquivos)
+selectPastaBtn.addEventListener('click', async () => {
+    // Usar input de diretório (funciona em navegadores modernos)
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.webkitdirectory = true;
+    input.directory = true;
     
-    selectedFiles.push(...validFiles);
-    updateFileList();
+    input.onchange = async (e) => {
+        const files = Array.from(e.target.files);
+        await organizarPorPastas(files);
+    };
+    
+    input.click();
+});
+
+async function organizarPorPastas(files) {
+    arquivosPorPasta.clear();
+    
+    for (const file of files) {
+        // Extrair caminho da pasta
+        const relativePath = file.webkitRelativePath;
+        const partes = relativePath.split('/');
+        const nomePasta = partes[0]; // Primeira pasta após a raiz
+        
+        if (!arquivosPorPasta.has(nomePasta)) {
+            arquivosPorPasta.set(nomePasta, []);
+        }
+        
+        // Filtrar apenas PDFs
+        if (file.name.toLowerCase().endsWith('.pdf') || 
+            file.name.toLowerCase().endsWith('.sor') || 
+            file.name.toLowerCase().endsWith('.msor')) {
+            arquivosPorPasta.get(nomePasta).push(file);
+        }
+    }
+    
+    // Atualizar interface
+    atualizarListaPastas();
+    pastaSelecionada = true;
+    pastaInfo.textContent = `📁 ${arquivosPorPasta.size} pasta(s) encontrada(s)`;
 }
 
-function updateFileList() {
-    fileList.innerHTML = '';
-    selectedFiles.forEach((file, index) => {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'file-item';
-        fileItem.innerHTML = `
-            <span class="file-name">${file.name}</span>
-            <span class="remove-file" data-index="${index}">✕</span>
-        `;
-        fileList.appendChild(fileItem);
-    });
+function atualizarListaPastas() {
+    subpastasList.innerHTML = '';
     
-    // Adicionar evento de remoção
-    document.querySelectorAll('.remove-file').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const index = parseInt(btn.dataset.index);
-            selectedFiles.splice(index, 1);
-            updateFileList();
-        });
-    });
+    for (const [nomePasta, arquivos] of arquivosPorPasta) {
+        const pastaCard = document.createElement('div');
+        pastaCard.className = 'pasta-card';
+        pastaCard.innerHTML = `
+            <div class="pasta-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <strong>${nomePasta}</strong>
+                <span class="arquivos-count">${arquivos.length} arquivo(s)</span>
+            </div>
+            <div class="arquivos-list">
+                ${arquivos.map(f => `<div class="arquivo-item">📄 ${f.name}</div>`).join('')}
+            </div>
+        `;
+        subpastasList.appendChild(pastaCard);
+    }
 }
 
 processarBtn.addEventListener('click', async () => {
+    if (!pastaSelecionada || arquivosPorPasta.size === 0) {
+        alert('Por favor, selecione uma pasta principal primeiro');
+        return;
+    }
+    
     const operador = document.getElementById('operador').value.trim();
     const comprimento = document.getElementById('comprimento').value;
-    const nomePasta = document.getElementById('pasta').value.trim();
     
     if (!operador) {
-        alert('Por favor, informe o nome do operador');
+        alert('Informe o nome do operador');
         return;
     }
     
     if (!comprimento || comprimento <= 0) {
-        alert('Por favor, informe um comprimento válido');
+        alert('Informe um comprimento válido');
         return;
     }
     
-    if (!nomePasta) {
-        alert('Por favor, informe o nome da pasta/bobina');
-        return;
-    }
-    
-    if (selectedFiles.length === 0) {
-        alert('Por favor, selecione pelo menos um arquivo PDF');
-        return;
-    }
-    
-    await processarArquivos(operador, parseFloat(comprimento), nomePasta);
+    await processarMultiplasPastas(operador, parseFloat(comprimento));
 });
 
-async function processarArquivos(operador, comprimento, nomePasta) {
-    // Mostrar progresso
+async function processarMultiplasPastas(operador, comprimento) {
     progressSection.style.display = 'block';
     resultSection.style.display = 'none';
     processarBtn.disabled = true;
     
-    const formData = new FormData();
-    selectedFiles.forEach(file => {
-        formData.append('files', file);
-    });
-    formData.append('operador', operador);
-    formData.append('comprimento_bobina', comprimento);
-    formData.append('nome_pasta', nomePasta);
+    excelBlobs = [];
+    const totalPastas = arquivosPorPasta.size;
+    let pastasProcessadas = 0;
     
-    try {
-        progressStatus.textContent = 'Enviando arquivos para processamento...';
-        progressBar.style.width = '30%';
+    for (const [nomePasta, arquivos] of arquivosPorPasta) {
+        progressStatus.textContent = `Processando pasta: ${nomePasta} (${pastasProcessadas + 1}/${totalPastas})`;
+        progressBar.style.width = `${(pastasProcessadas / totalPastas) * 100}%`;
         
-        const response = await fetch(`${API_URL}/processar`, {
-            method: 'POST',
-            body: formData
+        const formData = new FormData();
+        arquivos.forEach(file => {
+            formData.append('files', file);
         });
+        formData.append('operador', operador);
+        formData.append('comprimento_bobina', comprimento);
+        formData.append('nome_pasta_principal', nomePasta);
         
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Erro no processamento');
+        try {
+            const response = await fetch('/api/processar-pasta', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                const blob = await response.blob();
+                excelBlobs.push({
+                    nome: `BOBINA_${nomePasta}.xlsx`,
+                    blob: blob
+                });
+            }
+        } catch (error) {
+            console.error(`Erro ao processar ${nomePasta}:`, error);
         }
         
-        progressStatus.textContent = 'Processando PDFs...';
-        progressBar.style.width = '70%';
-        
-        excelBlob = await response.blob();
-        
-        progressStatus.textContent = 'Planilha gerada com sucesso!';
-        progressBar.style.width = '100%';
-        
-        setTimeout(() => {
-            progressSection.style.display = 'none';
-            resultSection.style.display = 'block';
-            resultMessage.textContent = `Foram processados ${selectedFiles.length} arquivo(s) da pasta "${nomePasta}". Sua planilha está pronta para download.`;
-            processarBtn.disabled = false;
-        }, 500);
-        
-    } catch (error) {
-        console.error('Erro:', error);
-        alert(`Erro ao processar: ${error.message}`);
-        progressSection.style.display = 'none';
-        processarBtn.disabled = false;
+        pastasProcessadas++;
     }
+    
+    progressBar.style.width = '100%';
+    progressStatus.textContent = 'Processamento concluído!';
+    
+    setTimeout(() => {
+        progressSection.style.display = 'none';
+        resultSection.style.display = 'block';
+        resultMessage.textContent = `${excelBlobs.length} planilha(s) gerada(s) com sucesso!`;
+        processarBtn.disabled = false;
+    }, 500);
 }
 
-downloadBtn.addEventListener('click', () => {
-    if (excelBlob) {
-        const url = window.URL.createObjectURL(excelBlob);
+downloadBtn.addEventListener('click', async () => {
+    if (excelBlobs.length === 1) {
+        // Apenas um arquivo: baixar diretamente
+        const url = URL.createObjectURL(excelBlobs[0].blob);
         const a = document.createElement('a');
         a.href = url;
-        const nomePasta = document.getElementById('pasta').value.trim();
-        a.download = `BOBINA_${nomePasta}.xlsx`;
-        document.body.appendChild(a);
+        a.download = excelBlobs[0].nome;
         a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
+    } else if (excelBlobs.length > 1) {
+        // Múltiplos arquivos: criar ZIP
+        const JSZip = window.JSZip;
+        const zip = new JSZip();
+        
+        for (const excel of excelBlobs) {
+            zip.file(excel.nome, excel.blob);
+        }
+        
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'planilhas_geradas.zip';
+        a.click();
+        URL.revokeObjectURL(url);
     }
 });
