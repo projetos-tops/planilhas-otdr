@@ -3,19 +3,12 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from typing import List, Dict
-import os
-import zipfile
 import io
-import tempfile
-import shutil
+import re
 from pathlib import Path
 
-from ..core.pdf_parser import PDFParserUniversal
-from ..core.excel_handler import ExcelHandler
+app = FastAPI()
 
-app = FastAPI(title="Pré-Lançamento System API", version="3.0.0")
-
-# Configurar CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,114 +17,84 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-pdf_parser = PDFParserUniversal()
-excel_handler = ExcelHandler()
-
-@app.get("/")
-async def root():
-    return {"message": "Pré-Lançamento System API", "version": "3.0.0"}
-
-@app.post("/processar-pasta")
+@app.post("/api/processar-pasta")
 async def processar_pasta(
     files: List[UploadFile] = File(...),
     comprimento_bobina: float = Form(...),
     operador: str = Form(...),
-    nome_pasta_principal: str = Form(...)
+    nome_pasta: str = Form(...)
 ):
-    """
-    Processa múltiplos arquivos de UMA pasta e retorna UM Excel
-    (Funcionalidade original: 1 pasta = 1 Excel)
-    """
+    """Processa uma pasta e retorna o Excel"""
+    
     try:
-        if not files:
-            raise HTTPException(status_code=400, detail="Nenhum arquivo enviado")
-        
-        # Processar cada arquivo da pasta
         dados_fibras = []
         
         for file in files:
-            if not any(file.filename.lower().endswith(ext) for ext in ['.pdf', '.sor', '.msor']):
-                continue
-            
             content = await file.read()
-            dados = await pdf_parser.extrair_dados(content, file.filename)
-            dados_fibras.append(dados)
+            
+            # Extrair dados básicos do PDF
+            texto = content.decode('latin-1', errors='ignore')
+            
+            # Extrair declive
+            declive = 0.0
+            declive_match = re.search(r'Declive\s+([\d\.]+)', texto)
+            if declive_match:
+                declive = float(declive_match.group(1))
+            
+            # Extrair distância
+            distancia = 0.0
+            dist_match = re.search(r'(\d+\.\d+)\s*m', texto)
+            if dist_match:
+                distancia = float(dist_match.group(1))
+            
+            # Extrair número da fibra
+            fibra = 0
+            fibra_match = re.search(r'F[-_]?(\d+)', file.filename, re.I)
+            if fibra_match:
+                fibra = int(fibra_match.group(1))
+            
+            dados_fibras.append({
+                "fibra": fibra,
+                "declive": declive,
+                "distancia_final": distancia,
+                "data": "",
+                "tipo": ""
+            })
         
-        if not dados_fibras:
-            raise HTTPException(status_code=400, detail="Nenhum arquivo PDF válido encontrado")
+        # Ordenar por fibra
+        dados_fibras.sort(key=lambda x: x["fibra"])
         
-        # Carregar template do Excel
-        template_path = Path(__file__).parent.parent / "template" / "modelo.xlsx"
+        # Criar Excel
+        from openpyxl import Workbook
+        wb = Workbook()
+        ws = wb.active
         
-        if not template_path.exists():
-            # Criar template básico
-            from openpyxl import Workbook
-            wb = Workbook()
-            ws = wb.active
-            template_content = io.BytesIO()
-            wb.save(template_content)
-            template_content.seek(0)
-            modelo_content = template_content.getvalue()
-        else:
-            with open(template_path, "rb") as f:
-                modelo_content = f.read()
+        # Preencher cabeçalho
+        ws['A8'] = f"BOBINA {nome_pasta}"
+        ws['G11'] = int(dados_fibras[0]["distancia_final"] - comprimento_bobina) if dados_fibras else 0
+        ws['A67'] = operador
         
-        # Gerar planilha para esta pasta
-        excel_content = await excel_handler.criar_planilha(
-            dados_fibras,
-            modelo_content,
-            nome_pasta_principal,  # Usa o nome da pasta como nome do arquivo
-            comprimento_bobina,
-            operador
-        )
+        # Preencher declives
+        linha = 15
+        for dado in dados_fibras:
+            ws[f'E{linha}'] = dado["declive"]
+            linha += 1
         
-        # Retornar o arquivo Excel
+        # Salvar
+        output = io.BytesIO()
+        wb.save(output)
+        output.seek(0)
+        
         return StreamingResponse(
-            io.BytesIO(excel_content),
+            output,
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            headers={"Content-Disposition": f"attachment; filename=BOBINA_{nome_pasta_principal}.xlsx"}
+            headers={"Content-Disposition": f"attachment; filename=BOBINA_{nome_pasta}.xlsx"}
         )
         
     except Exception as e:
+        print(f"Erro: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/processar-multiplas-pastas")
-async def processar_multiplas_pastas(
-    pastas: List[dict] = Form(...),  # Lista de {nome_pasta: [arquivos]}
-    comprimento_bobina: float = Form(...),
-    operador: str = Form(...)
-):
-    """
-    Processa MÚLTIPLAS pastas e retorna um ZIP com vários Excels
-    (Funcionalidade original: varre todas subpastas)
-    """
-    try:
-        zip_buffer = io.BytesIO()
-        
-        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            for pasta_info in pastas:
-                nome_pasta = pasta_info.get("nome_pasta")
-                arquivos = pasta_info.get("arquivos", [])
-                
-                if not arquivos:
-                    continue
-                
-                # Processar arquivos da pasta
-                dados_fibras = []
-                for arquivo_info in arquivos:
-                    # Aqui viria a lógica de processamento
-                    pass
-                
-                # Gerar Excel para esta pasta
-                # Adicionar ao ZIP
-                
-        zip_buffer.seek(0)
-        
-        return StreamingResponse(
-            zip_buffer,
-            media_type="application/zip",
-            headers={"Content-Disposition": "attachment; filename=planilhas_geradas.zip"}
-        )
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/api/health")
+async def health():
+    return {"status": "ok"}

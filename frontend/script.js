@@ -1,10 +1,11 @@
 // frontend/script.js
-let pastaSelecionada = null;
-let arquivosPorPasta = new Map();
+let pastasEncontradas = new Map(); // nome da pasta -> arquivos
+let planilhasGeradas = [];
 
-// Elementos DOM
+// Elementos
 const selectPastaBtn = document.getElementById('selectPastaBtn');
 const pastaInfo = document.getElementById('pastaInfo');
+const pastasList = document.getElementById('pastasList');
 const processarBtn = document.getElementById('processarBtn');
 const progressSection = document.getElementById('progressSection');
 const resultSection = document.getElementById('resultSection');
@@ -12,14 +13,9 @@ const progressBar = document.getElementById('progressBar');
 const progressStatus = document.getElementById('progressStatus');
 const resultMessage = document.getElementById('resultMessage');
 const downloadBtn = document.getElementById('downloadBtn');
-const subpastasList = document.getElementById('subpastasList');
 
-let excelBlobs = [];
-let zipBlob = null;
-
-// Selecionar PASTA PRINCIPAL (não arquivos)
-selectPastaBtn.addEventListener('click', async () => {
-    // Usar input de diretório (funciona em navegadores modernos)
+// Selecionar pasta principal
+selectPastaBtn.addEventListener('click', () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.webkitdirectory = true;
@@ -34,60 +30,45 @@ selectPastaBtn.addEventListener('click', async () => {
 });
 
 async function organizarPorPastas(files) {
-    arquivosPorPasta.clear();
+    pastasEncontradas.clear();
     
     for (const file of files) {
-        // Extrair caminho da pasta
         const relativePath = file.webkitRelativePath;
-        const partes = relativePath.split('/');
-        const nomePasta = partes[0]; // Primeira pasta após a raiz
+        const nomePasta = relativePath.split('/')[0];
         
-        if (!arquivosPorPasta.has(nomePasta)) {
-            arquivosPorPasta.set(nomePasta, []);
+        if (!pastasEncontradas.has(nomePasta)) {
+            pastasEncontradas.set(nomePasta, []);
         }
         
-        // Filtrar apenas PDFs
+        // Só adicionar PDFs
         if (file.name.toLowerCase().endsWith('.pdf') || 
             file.name.toLowerCase().endsWith('.sor') || 
             file.name.toLowerCase().endsWith('.msor')) {
-            arquivosPorPasta.get(nomePasta).push(file);
+            pastasEncontradas.get(nomePasta).push(file);
         }
     }
     
-    // Atualizar interface
+    // Atualizar interface - mostra SÓ AS PASTAS
     atualizarListaPastas();
-    pastaSelecionada = true;
-    pastaInfo.textContent = `📁 ${arquivosPorPasta.size} pasta(s) encontrada(s)`;
+    pastaInfo.textContent = `📁 ${pastasEncontradas.size} pasta(s) encontrada(s)`;
 }
 
 function atualizarListaPastas() {
-    subpastasList.innerHTML = '';
+    pastasList.innerHTML = '';
     
-    for (const [nomePasta, arquivos] of arquivosPorPasta) {
-        const pastaCard = document.createElement('div');
-        pastaCard.className = 'pasta-card';
-        pastaCard.innerHTML = `
-            <div class="pasta-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <strong>${nomePasta}</strong>
-                <span class="arquivos-count">${arquivos.length} arquivo(s)</span>
-            </div>
-            <div class="arquivos-list">
-                ${arquivos.map(f => `<div class="arquivo-item">📄 ${f.name}</div>`).join('')}
-            </div>
+    for (const [nomePasta, arquivos] of pastasEncontradas) {
+        const pastaDiv = document.createElement('div');
+        pastaDiv.className = 'pasta-item';
+        pastaDiv.innerHTML = `
+            <span>📁 ${nomePasta}</span>
+            <span class="badge">${arquivos.length} arquivos</span>
         `;
-        subpastasList.appendChild(pastaCard);
+        pastasList.appendChild(pastaDiv);
     }
 }
 
+// Processar todas as pastas
 processarBtn.addEventListener('click', async () => {
-    if (!pastaSelecionada || arquivosPorPasta.size === 0) {
-        alert('Por favor, selecione uma pasta principal primeiro');
-        return;
-    }
-    
     const operador = document.getElementById('operador').value.trim();
     const comprimento = document.getElementById('comprimento').value;
     
@@ -97,25 +78,30 @@ processarBtn.addEventListener('click', async () => {
     }
     
     if (!comprimento || comprimento <= 0) {
-        alert('Informe um comprimento válido');
+        alert('Informe o comprimento da bobina');
         return;
     }
     
-    await processarMultiplasPastas(operador, parseFloat(comprimento));
+    if (pastasEncontradas.size === 0) {
+        alert('Selecione uma pasta principal primeiro');
+        return;
+    }
+    
+    await processarTodasPastas(operador, parseFloat(comprimento));
 });
 
-async function processarMultiplasPastas(operador, comprimento) {
+async function processarTodasPastas(operador, comprimento) {
     progressSection.style.display = 'block';
     resultSection.style.display = 'none';
     processarBtn.disabled = true;
     
-    excelBlobs = [];
-    const totalPastas = arquivosPorPasta.size;
-    let pastasProcessadas = 0;
+    planilhasGeradas = [];
+    const totalPastas = pastasEncontradas.size;
+    let processadas = 0;
     
-    for (const [nomePasta, arquivos] of arquivosPorPasta) {
-        progressStatus.textContent = `Processando pasta: ${nomePasta} (${pastasProcessadas + 1}/${totalPastas})`;
-        progressBar.style.width = `${(pastasProcessadas / totalPastas) * 100}%`;
+    for (const [nomePasta, arquivos] of pastasEncontradas) {
+        progressStatus.textContent = `Processando: ${nomePasta} (${processadas + 1}/${totalPastas})`;
+        progressBar.style.width = `${(processadas / totalPastas) * 100}%`;
         
         const formData = new FormData();
         arquivos.forEach(file => {
@@ -123,7 +109,7 @@ async function processarMultiplasPastas(operador, comprimento) {
         });
         formData.append('operador', operador);
         formData.append('comprimento_bobina', comprimento);
-        formData.append('nome_pasta_principal', nomePasta);
+        formData.append('nome_pasta', nomePasta);
         
         try {
             const response = await fetch('/api/processar-pasta', {
@@ -133,47 +119,44 @@ async function processarMultiplasPastas(operador, comprimento) {
             
             if (response.ok) {
                 const blob = await response.blob();
-                excelBlobs.push({
+                planilhasGeradas.push({
                     nome: `BOBINA_${nomePasta}.xlsx`,
                     blob: blob
                 });
             }
         } catch (error) {
-            console.error(`Erro ao processar ${nomePasta}:`, error);
+            console.error(`Erro em ${nomePasta}:`, error);
         }
         
-        pastasProcessadas++;
+        processadas++;
+        progressBar.style.width = `${(processadas / totalPastas) * 100}%`;
     }
     
+    progressStatus.textContent = 'Concluído!';
     progressBar.style.width = '100%';
-    progressStatus.textContent = 'Processamento concluído!';
     
     setTimeout(() => {
         progressSection.style.display = 'none';
         resultSection.style.display = 'block';
-        resultMessage.textContent = `${excelBlobs.length} planilha(s) gerada(s) com sucesso!`;
+        resultMessage.textContent = `${planilhasGeradas.length} planilha(s) gerada(s)`;
         processarBtn.disabled = false;
     }, 500);
 }
 
+// Download
 downloadBtn.addEventListener('click', async () => {
-    if (excelBlobs.length === 1) {
-        // Apenas um arquivo: baixar diretamente
-        const url = URL.createObjectURL(excelBlobs[0].blob);
+    if (planilhasGeradas.length === 1) {
+        const url = URL.createObjectURL(planilhasGeradas[0].blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = excelBlobs[0].nome;
+        a.download = planilhasGeradas[0].nome;
         a.click();
         URL.revokeObjectURL(url);
-    } else if (excelBlobs.length > 1) {
-        // Múltiplos arquivos: criar ZIP
-        const JSZip = window.JSZip;
+    } else if (planilhasGeradas.length > 1) {
         const zip = new JSZip();
-        
-        for (const excel of excelBlobs) {
-            zip.file(excel.nome, excel.blob);
+        for (const planilha of planilhasGeradas) {
+            zip.file(planilha.nome, planilha.blob);
         }
-        
         const zipBlob = await zip.generateAsync({ type: 'blob' });
         const url = URL.createObjectURL(zipBlob);
         const a = document.createElement('a');
