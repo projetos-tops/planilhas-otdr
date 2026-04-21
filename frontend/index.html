@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pré-Lançamento System - Processador de PDFs</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 7H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M8 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M8 17H12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <h1>Pré-Lançamento System</h1>
+            </div>
+            <p class="subtitle">Processe múltiplos PDFs e gere planilhas Excel automaticamente</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Formulário -->
+            <div class="form-card">
+                <div class="form-group">
+                    <label for="operador">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Nome do Operador
+                    </label>
+                    <input type="text" id="operador" placeholder="Digite o nome do operador" class="input-field">
+                </div>
+
+                <div class="form-group">
+                    <label for="comprimento">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                        Comprimento da Bobina (metros)
+                    </label>
+                    <input type="number" id="comprimento" placeholder="Ex: 2000" class="input-field">
+                </div>
+
+                <div class="form-group">
+                    <label for="pasta">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Nome da Pasta/Bobina
+                    </label>
+                    <input type="text" id="pasta" placeholder="Ex: BOBINA_35" class="input-field">
+                </div>
+
+                <div class="form-group">
+                    <label for="files">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                            <polyline points="13 2 13 9 20 9"></polyline>
+                        </svg>
+                        Arquivos PDF
+                    </label>
+                    <div class="file-drop-area" id="dropArea">
+                        <input type="file" id="files" multiple accept=".pdf,.sor,.msor" style="display: none;">
+                        <div class="file-drop-message">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <p>Arraste e solte os arquivos aqui ou <span class="browse-link">clique para selecionar</span></p>
+                            <small>Suporta PDF, SOR e MSOR</small>
+                        </div>
+                        <div class="file-list" id="fileList"></div>
+                    </div>
+                </div>
+
+                <button id="processarBtn" class="btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    Processar Arquivos
+                </button>
+            </div>
+
+            <!-- Progresso -->
+            <div class="progress-section" id="progressSection" style="display: none;">
+                <div class="progress-card">
+                    <h3>Processamento em Andamento</h3>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <p class="progress-status" id="progressStatus">Inicializando...</p>
+                </div>
+            </div>
+
+            <!-- Resultado -->
+            <div class="result-section" id="resultSection" style="display: none;">
+                <div class="result-card">
+                    <div class="result-icon success">✅</div>
+                    <h3>Processamento Concluído!</h3>
+                    <p id="resultMessage"></p>
+                    <button id="downloadBtn" class="btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Baixar Planilha
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2024 Pré-Lançamento System - Versão 3.0</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
