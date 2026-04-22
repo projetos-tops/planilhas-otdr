@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Pré-Lançamento - Web</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; }
+        .campo { margin-bottom: 15px; }
+        label { display: inline-block; width: 180px; font-weight: bold; }
+        input, button { padding: 8px; font-size: 16px; }
+        button { background: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #45a049; }
+        #status { margin-top: 20px; padding: 10px; border-radius: 4px; }
+        .sucesso { background: #d4edda; color: #155724; }
+        .erro { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        progress { width: 100%; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <h1>📡 Sistema Pré-Lançamento de Fibras Ópticas</h1>
+    <p>Envie um arquivo <strong>.ZIP</strong> contendo a pasta <strong>PRE-LANÇAMENTO</strong> (com subpastas por bobina e PDFs das fibras).</p>
+    <p><em>Limitação: o arquivo ZIP deve ter no máximo 4MB (devido ao Vercel).</em></p>
+
+    <div class="campo">
+        <label>Arquivo ZIP:</label>
+        <input type="file" id="zipFile" accept=".zip">
+    </div>
+    <div class="campo">
+        <label>Comprimento da Bobina (m):</label>
+        <input type="number" id="comprimento" step="0.1" required>
+    </div>
+    <div class="campo">
+        <label>Nome do Operador:</label>
+        <input type="text" id="operador" required>
+    </div>
+    <button id="btnProcessar">▶ GERAR PLANILHAS</button>
+
+    <div id="status" style="display: none;"></div>
+    <progress id="progresso" value="0" max="100" style="width:100%; display:none;"></progress>
+
+    <script>
+        const btn = document.getElementById('btnProcessar');
+        const statusDiv = document.getElementById('status');
+        const progresso = document.getElementById('progresso');
+
+        btn.addEventListener('click', async () => {
+            const zipFile = document.getElementById('zipFile').files[0];
+            const comprimento = document.getElementById('comprimento').value;
+            const operador = document.getElementById('operador').value;
+
+            if (!zipFile) {
+                mostrarStatus('Selecione um arquivo ZIP.', 'erro');
+                return;
+            }
+            if (!comprimento || isNaN(comprimento)) {
+                mostrarStatus('Informe o comprimento da bobina.', 'erro');
+                return;
+            }
+            if (!operador.trim()) {
+                mostrarStatus('Informe o nome do operador.', 'erro');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('zip', zipFile);
+            formData.append('comprimento', comprimento);
+            formData.append('operador', operador);
+
+            btn.disabled = true;
+            btn.textContent = 'Processando...';
+            mostrarStatus('Enviando e processando... Aguarde (pode levar alguns segundos).', 'info');
+            progresso.style.display = 'block';
+            progresso.value = 30;
+
+            try {
+                const response = await fetch('/api/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                progresso.value = 80;
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'planilhas_geradas.zip';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                    mostrarStatus('✅ Processamento concluído! O download do ZIP com as planilhas foi iniciado.', 'sucesso');
+                } else {
+                    const errorText = await response.text();
+                    mostrarStatus(`Erro no servidor: ${errorText}`, 'erro');
+                }
+            } catch (err) {
+                mostrarStatus(`Erro de conexão: ${err.message}`, 'erro');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '▶ GERAR PLANILHAS';
+                progresso.style.display = 'none';
+                progresso.value = 0;
+            }
+        });
+
+        function mostrarStatus(msg, tipo) {
+            statusDiv.textContent = msg;
+            statusDiv.className = tipo;
+            statusDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
