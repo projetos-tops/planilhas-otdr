@@ -1,11 +1,17 @@
 {
   "functions": {
     "api/process.py": {
-      "runtime": "python3.9",
-      "maxDuration": 10
+      "runtime": "@vercel/python@3.9.0"
     }
   },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/process.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }
