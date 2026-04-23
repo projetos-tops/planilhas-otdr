@@ -11,17 +11,22 @@
         input, button { padding: 8px; font-size: 16px; }
         button { background: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px; }
         button:hover { background: #45a049; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
         #status { margin-top: 20px; padding: 10px; border-radius: 4px; }
         .sucesso { background: #d4edda; color: #155724; }
         .erro { background: #f8d7da; color: #721c24; }
         .info { background: #d1ecf1; color: #0c5460; }
         progress { width: 100%; margin-top: 15px; }
+        .aviso { background: #fff3cd; color: #856404; padding: 10px; margin: 10px 0; border-radius: 4px; }
     </style>
 </head>
 <body>
     <h1>📡 Sistema Pré-Lançamento de Fibras Ópticas</h1>
-    <p>Envie um arquivo <strong>.ZIP</strong> contendo a pasta <strong>PRE-LANÇAMENTO</strong> (com subpastas por bobina e PDFs das fibras).</p>
-    <p><em>Limitação: o arquivo ZIP deve ter no máximo 4MB (devido ao Vercel).</em></p>
+    
+    <div class="aviso">
+        ⚠️ <strong>Limitação:</strong> O arquivo ZIP deve ter no máximo <strong>4.5MB</strong> devido às restrições do Vercel. 
+        Para arquivos maiores, processe poucas bobinas por vez ou use um servidor próprio.
+    </div>
 
     <div class="campo">
         <label>Arquivo ZIP:</label>
@@ -44,9 +49,23 @@
         const btn = document.getElementById('btnProcessar');
         const statusDiv = document.getElementById('status');
         const progresso = document.getElementById('progresso');
+        const zipInput = document.getElementById('zipFile');
+
+        zipInput.addEventListener('change', function() {
+            if (this.files[0]) {
+                const sizeMB = this.files[0].size / (1024 * 1024);
+                if (sizeMB > 4.5) {
+                    mostrarStatus(`⚠️ Arquivo muito grande: ${sizeMB.toFixed(2)}MB. Máximo permitido: 4.5MB.`, 'erro');
+                    btn.disabled = true;
+                } else {
+                    mostrarStatus(`✅ Arquivo OK: ${sizeMB.toFixed(2)}MB`, 'sucesso');
+                    btn.disabled = false;
+                }
+            }
+        });
 
         btn.addEventListener('click', async () => {
-            const zipFile = document.getElementById('zipFile').files[0];
+            const zipFile = zipInput.files[0];
             const comprimento = document.getElementById('comprimento').value;
             const operador = document.getElementById('operador').value;
 
@@ -64,7 +83,7 @@
             }
 
             const formData = new FormData();
-            formData.append('zip', zipFile);
+            formData.append('zip_file', zipFile);
             formData.append('comprimento', comprimento);
             formData.append('operador', operador);
 
@@ -93,6 +112,8 @@
                     a.remove();
                     window.URL.revokeObjectURL(url);
                     mostrarStatus('✅ Processamento concluído! O download do ZIP com as planilhas foi iniciado.', 'sucesso');
+                } else if (response.status === 413) {
+                    mostrarStatus('❌ Erro 413: Arquivo muito grande. O limite é 4.5MB. Reduza o tamanho do ZIP.', 'erro');
                 } else {
                     const errorText = await response.text();
                     mostrarStatus(`Erro no servidor: ${errorText}`, 'erro');
