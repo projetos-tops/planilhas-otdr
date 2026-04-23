@@ -21,7 +21,7 @@
             overflow-x: hidden;
         }
 
-        /* ========== BACKGROUND HIGH-TECH COMPLETO ========== */
+        /* Background high-tech completo */
         .tech-bg {
             position: fixed;
             top: 0;
@@ -32,7 +32,6 @@
             overflow: hidden;
         }
 
-        /* Grade de dados - efeito matrix/tech */
         .data-grid {
             position: absolute;
             width: 100%;
@@ -49,7 +48,6 @@
             50% { opacity: 0.6; }
         }
 
-        /* Linhas de fibra óptica pulsantes */
         .fiber-stream {
             position: absolute;
             width: 100%;
@@ -59,35 +57,19 @@
         .fiber-line {
             position: absolute;
             height: 2px;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(0, 212, 255, 0.5), 
-                rgba(0, 100, 255, 0.7), 
-                rgba(0, 212, 255, 0.5), 
-                transparent);
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), rgba(0, 100, 255, 0.7), rgba(0, 212, 255, 0.5), transparent);
             filter: blur(1px);
             border-radius: 2px;
             animation: fiberFlow 3s ease-in-out infinite;
         }
 
         @keyframes fiberFlow {
-            0% {
-                transform: translateX(-100%) scaleX(1);
-                opacity: 0;
-            }
-            20% {
-                opacity: 0.8;
-            }
-            80% {
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateX(200%) scaleX(1.5);
-                opacity: 0;
-            }
+            0% { transform: translateX(-100%) scaleX(1); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateX(200%) scaleX(1.5); opacity: 0; }
         }
 
-        /* Dados binários flutuantes */
         .binary-rain {
             position: absolute;
             font-family: 'Courier New', monospace;
@@ -100,23 +82,12 @@
         }
 
         @keyframes binaryFall {
-            from {
-                transform: translateY(-100%) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.25;
-            }
-            90% {
-                opacity: 0.25;
-            }
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
+            from { transform: translateY(-100%) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.25; }
+            90% { opacity: 0.25; }
+            to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
 
-        /* Nós de rede */
         .network-node {
             position: absolute;
             width: 3px;
@@ -132,7 +103,6 @@
             50% { opacity: 1; transform: scale(2.5); box-shadow: 0 0 15px #00D4FF; }
         }
 
-        /* Linhas de conexão de rede */
         .network-line {
             position: absolute;
             height: 1px;
@@ -154,7 +124,6 @@
             padding: 1.5rem 2rem 2.5rem;
         }
 
-        /* Header */
         .header {
             text-align: center;
             margin-bottom: 2.5rem;
@@ -252,7 +221,6 @@
             50% { opacity: 1; text-shadow: 0 0 5px #00D4FF; }
         }
 
-        /* Cards */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -261,12 +229,8 @@
         }
 
         @media (max-width: 900px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 1rem;
-            }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
         }
 
         .card {
@@ -296,12 +260,6 @@
             100% { transform: translateX(100%); }
         }
 
-        .card:hover {
-            border-color: rgba(0, 212, 255, 0.6);
-            box-shadow: 0 15px 40px -12px rgba(0, 212, 255, 0.3);
-            transform: translateY(-3px);
-        }
-
         .card-header {
             padding: 1.2rem 1.8rem;
             border-bottom: 1px solid rgba(0, 212, 255, 0.15);
@@ -325,15 +283,9 @@
             color: #CCE6FF;
         }
 
-        .card-body {
-            padding: 1.8rem;
-        }
+        .card-body { padding: 1.8rem; }
 
-        /* Formulários */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
+        .form-group { margin-bottom: 1.5rem; }
         .form-group label {
             display: flex;
             align-items: center;
@@ -345,11 +297,7 @@
             color: #5F7F9E;
             margin-bottom: 0.6rem;
         }
-
-        .form-group label i {
-            font-size: 0.75rem;
-            color: #00D4FF;
-        }
+        .form-group label i { font-size: 0.75rem; color: #00D4FF; }
 
         .input-container {
             display: flex;
@@ -453,10 +401,7 @@
             background: linear-gradient(95deg, #0088FF, #00D4FF, #00EEFF);
         }
 
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .progress-card {
             background: rgba(5, 15, 22, 0.85);
@@ -469,7 +414,6 @@
         .progress-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             margin-bottom: 1rem;
             font-size: 0.8rem;
             font-weight: 500;
@@ -526,25 +470,9 @@
             border: 1px solid rgba(0, 212, 255, 0.2);
             transition: all 0.2s;
         }
-
-        .metric-item:hover {
-            border-color: #00D4FF;
-            box-shadow: 0 0 15px rgba(0,212,255,0.2);
-        }
-
-        .metric-label {
-            font-size: 0.65rem;
-            color: #5F7F9E;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .metric-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #00D4FF;
-            margin-top: 5px;
-        }
+        .metric-item:hover { border-color: #00D4FF; box-shadow: 0 0 15px rgba(0,212,255,0.2); }
+        .metric-label { font-size: 0.65rem; color: #5F7F9E; text-transform: uppercase; letter-spacing: 1px; }
+        .metric-value { font-size: 1.3rem; font-weight: 700; color: #00D4FF; margin-top: 5px; }
 
         .footer-note {
             text-align: center;
@@ -561,7 +489,6 @@
     </style>
 </head>
 <body>
-
 <div class="tech-bg">
     <div class="data-grid"></div>
     <div class="fiber-stream" id="fiberStream"></div>
@@ -571,13 +498,8 @@
 <div class="container">
     <div class="header">
         <div class="logo-area">
-            <div class="logo-icon">
-                <i class="fas fa-fiber-optic"></i>
-            </div>
-            <div class="logo-text">
-                FIBEROTDR
-                <span class="logo-badge">TELECOM</span>
-            </div>
+            <div class="logo-icon"><i class="fas fa-fiber-optic"></i></div>
+            <div class="logo-text">FIBEROTDR<span class="logo-badge">TELECOM</span></div>
         </div>
         <h1>Pré-Lançamento de Redes Ópticas</h1>
         <div class="fiber-stats">
@@ -590,31 +512,21 @@
 
     <div class="dashboard-grid">
         <div class="card">
-            <div class="card-header">
-                <i class="fas fa-user-astronaut"></i>
-                <h3>Operador & Parâmetros da Rede</h3>
-            </div>
+            <div class="card-header"><i class="fas fa-user-astronaut"></i><h3>Operador & Parâmetros</h3></div>
             <div class="card-body">
                 <div class="form-group">
-                    <label><i class="fas fa-id-card"></i> Nome do Operador / Técnico</label>
-                    <div class="input-container">
-                        <input type="text" id="operadorNome" placeholder="Ex: Técnico Especialista - João Mendes" autocomplete="off">
-                    </div>
+                    <label><i class="fas fa-id-card"></i> Nome do Operador</label>
+                    <div class="input-container"><input type="text" id="operadorNome" placeholder="Ex: João Silva - Equipe OTDR"></div>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-ruler"></i> Comprimento da Bobina (metros)</label>
-                    <div class="input-container">
-                        <input type="number" id="comprimentoBobina" placeholder="Ex: 500" step="any">
-                    </div>
+                    <div class="input-container"><input type="number" id="comprimentoBobina" placeholder="Ex: 500" step="any"></div>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header">
-                <i class="fas fa-folder-tree"></i>
-                <h3>Fontes de Dados Ópticos</h3>
-            </div>
+            <div class="card-header"><i class="fas fa-folder-tree"></i><h3>Fontes de Dados</h3></div>
             <div class="card-body">
                 <div class="form-group">
                     <label><i class="fas fa-inbox"></i> Pasta PRE-LANÇAMENTO (subpastas com PDFs)</label>
@@ -642,132 +554,87 @@
     </div>
 
     <div class="action-card">
-        <button class="btn-primary" id="btnGerar">
-            <i class="fas fa-play-circle"></i> PROCESSAR FIBRAS ÓPTICAS
-            <i class="fas fa-fiber-optic"></i>
-        </button>
+        <button class="btn-primary" id="btnGerar"><i class="fas fa-play-circle"></i> PROCESSAR FIBRAS ÓPTICAS <i class="fas fa-fiber-optic"></i></button>
     </div>
 
     <div class="progress-card">
-        <div class="progress-header">
-            <span><i class="fas fa-charging-station"></i> Monitor de Processamento</span>
-            <span id="progressPercent" style="font-weight: 700; color:#00D4FF;">0%</span>
-        </div>
-        <div class="progress-bar-wrapper">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        <div id="progressText" style="font-size: 0.7rem; color:#5F7F9E; margin-top: 5px;">Aguardando inicialização</div>
-        
-        <div class="status-area" id="statusArea">
-            <i class="fas fa-info-circle"></i> Sistema de pré-lançamento FTTH pronto. Configure e inicie.
-        </div>
-
+        <div class="progress-header"><span><i class="fas fa-charging-station"></i> Monitor de Processamento</span><span id="progressPercent" style="font-weight:700;color:#00D4FF;">0%</span></div>
+        <div class="progress-bar-wrapper"><div class="progress-fill" id="progressFill"></div></div>
+        <div id="progressText" style="font-size:0.7rem;color:#5F7F9E;">Aguardando inicialização</div>
+        <div class="status-area" id="statusArea"><i class="fas fa-info-circle"></i> Sistema pronto. Configure e inicie.</div>
         <div class="metrics">
-            <div class="metric-item">
-                <div class="metric-label"><i class="fas fa-layer-group"></i> Pastas Detectadas</div>
-                <div class="metric-value" id="metricFolders">0</div>
-            </div>
-            <div class="metric-item">
-                <div class="metric-label"><i class="fas fa-file-pdf"></i> Relatórios OTDR</div>
-                <div class="metric-value" id="metricPDFs">0</div>
-            </div>
-            <div class="metric-item">
-                <div class="metric-label"><i class="fas fa-microchip"></i> Status</div>
-                <div class="metric-value" id="metricStatus">⚫ IDLE</div>
-            </div>
+            <div class="metric-item"><div class="metric-label"><i class="fas fa-layer-group"></i> Pastas</div><div class="metric-value" id="metricFolders">0</div></div>
+            <div class="metric-item"><div class="metric-label"><i class="fas fa-file-pdf"></i> PDFs</div><div class="metric-value" id="metricPDFs">0</div></div>
+            <div class="metric-item"><div class="metric-label"><i class="fas fa-microchip"></i> Status</div><div class="metric-value" id="metricStatus">⚫ IDLE</div></div>
         </div>
     </div>
-
     <div class="footer-note">
         <span><i class="fas fa-shield-alt"></i> Processamento 100% local</span>
-        <span><i class="fas fa-chart-line"></i> Compatível com padrões OTDR</span>
-        <span><i class="fas fa-fiber-optic"></i> Sistema profissional para redes de fibra óptica</span>
+        <span><i class="fas fa-chart-line"></i> Compatível com OTDR</span>
+        <span><i class="fas fa-fiber-optic"></i> Sistema profissional</span>
     </div>
 </div>
 
-<!-- Bibliotecas -->
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-
 <script>
-    // Configuração do PDF.js worker (CORREÇÃO DO ERRO)
+    // Configuração obrigatória do PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
-    // ========== CRIAÇÃO DO BACKGROUND HIGH-TECH ==========
+    // ========== BACKGROUND HIGH-TECH ==========
     function createTechBackground() {
         const fiberStream = document.getElementById('fiberStream');
         const networkNodes = document.getElementById('networkNodes');
-        
-        // Linhas de fibra óptica
         for (let i = 0; i < 20; i++) {
             const line = document.createElement('div');
             line.className = 'fiber-line';
             line.style.top = `${Math.random() * 100}%`;
             line.style.left = `${Math.random() * 100}%`;
             line.style.width = `${150 + Math.random() * 250}px`;
-            line.style.height = `${1 + Math.random() * 2}px`;
             line.style.animationDelay = `${Math.random() * 5}s`;
-            line.style.animationDuration = `${2 + Math.random() * 3}s`;
             fiberStream.appendChild(line);
         }
-        
-        // Nós de rede
-        const nodePositions = [];
+        const positions = [];
         for (let i = 0; i < 30; i++) {
             const node = document.createElement('div');
             node.className = 'network-node';
-            const x = Math.random() * 100;
-            const y = Math.random() * 100;
+            const x = Math.random() * 100, y = Math.random() * 100;
             node.style.left = `${x}%`;
             node.style.top = `${y}%`;
-            node.style.animationDelay = `${Math.random() * 3}s`;
             networkNodes.appendChild(node);
-            nodePositions.push({ x, y });
+            positions.push({x,y});
         }
-        
-        // Conexões entre nós
-        for (let i = 0; i < nodePositions.length; i++) {
-            for (let j = i + 1; j < nodePositions.length; j++) {
-                const dx = nodePositions[i].x - nodePositions[j].x;
-                const dy = nodePositions[i].y - nodePositions[j].y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 12 && distance > 4) {
+        for (let i = 0; i < positions.length; i++) {
+            for (let j = i+1; j < positions.length; j++) {
+                const dx = positions[i].x - positions[j].x;
+                const dy = positions[i].y - positions[j].y;
+                const dist = Math.hypot(dx, dy);
+                if (dist < 12 && dist > 4) {
                     const line = document.createElement('div');
                     line.className = 'network-line';
                     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                    const width = distance;
-                    line.style.width = `${width}%`;
-                    line.style.left = `${nodePositions[i].x}%`;
-                    line.style.top = `${nodePositions[i].y}%`;
+                    line.style.width = `${dist}%`;
+                    line.style.left = `${positions[i].x}%`;
+                    line.style.top = `${positions[i].y}%`;
                     line.style.transform = `rotate(${angle}deg)`;
-                    line.style.animationDelay = `${Math.random() * 2}s`;
                     networkNodes.appendChild(line);
                 }
             }
         }
-        
-        // Dados binários flutuantes
         for (let i = 0; i < 40; i++) {
-            const binary = document.createElement('div');
-            binary.className = 'binary-rain';
-            const patterns = ['10', '01', '110', '101', '011', '1001', '0101', '0011'];
-            binary.textContent = patterns[Math.floor(Math.random() * patterns.length)] + ' ';
-            binary.style.left = `${Math.random() * 100}%`;
-            binary.style.animationDelay = `${Math.random() * 8}s`;
-            binary.style.animationDuration = `${6 + Math.random() * 10}s`;
-            binary.style.fontSize = `${8 + Math.random() * 6}px`;
-            document.querySelector('.tech-bg').appendChild(binary);
+            const bin = document.createElement('div');
+            bin.className = 'binary-rain';
+            bin.textContent = ['10','01','110','101','011','1001'][Math.floor(Math.random()*6)] + ' ';
+            bin.style.left = `${Math.random() * 100}%`;
+            bin.style.animationDelay = `${Math.random() * 8}s`;
+            bin.style.animationDuration = `${6 + Math.random() * 10}s`;
+            document.querySelector('.tech-bg').appendChild(bin);
         }
     }
-    
     createTechBackground();
 
-    // ========== LÓGICA DO SISTEMA ==========
-    let state = {
-        executando: false,
-        pastaBaseFiles: null,
-        modeloFile: null
-    };
+    // ========== LÓGICA PRINCIPAL IGUAL AO ORIGINAL ==========
+    let state = { executando: false, pastaBaseFiles: null, modeloFile: null };
 
     const DOM = {
         operador: document.getElementById('operadorNome'),
@@ -801,6 +668,38 @@
         DOM.progressText.innerText = detail || `Processando ${current} de ${total} pastas`;
     }
 
+    // ========== FUNÇÃO QUE TRATA CÉLULAS MESCLADAS (igual ao original) ==========
+    function escreverEmMesclada(ws, cellRef, valor) {
+        // Converte referência A1 para índices
+        const match = cellRef.match(/([A-Z]+)(\d+)/);
+        if (!match) return;
+        const col = match[1];
+        const row = parseInt(match[2]);
+        
+        // Verifica se a célula pertence a alguma região mesclada
+        if (ws['!merges']) {
+            for (const merge of ws['!merges']) {
+                // merge é { s: { r, c }, e: { r, c } }
+                const startRow = merge.s.r + 1;
+                const endRow = merge.e.r + 1;
+                const startCol = String.fromCharCode(65 + merge.s.c);
+                const endCol = String.fromCharCode(65 + merge.e.c);
+                
+                if (row >= startRow && row <= endRow && col >= startCol && col <= endCol) {
+                    // Escreve na célula superior esquerda da mescla
+                    const topLeft = `${startCol}${startRow}`;
+                    if (!ws[topLeft]) ws[topLeft] = { t: 's', v: valor };
+                    else ws[topLeft].v = valor;
+                    return;
+                }
+            }
+        }
+        // Se não estiver mesclada, escreve diretamente
+        if (!ws[cellRef]) ws[cellRef] = { t: 's', v: valor };
+        else ws[cellRef].v = valor;
+    }
+
+    // ========== EXTRAÇÃO DOS DADOS DO PDF ==========
     async function extrairDadosPDF(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -814,7 +713,6 @@
                         const textContent = await page.getTextContent();
                         fullText += textContent.items.map(item => item.str).join(' ') + '\n';
                     }
-                    
                     const nome = file.name;
                     const bobina = (nome.match(/B-(\d+)/i) || [])[1] || null;
                     const data = (fullText.match(/Data de impressão\s*:\s*(\d{2}\/\d{2}\/\d{4})/) || [])[1] || '';
@@ -849,28 +747,42 @@
         });
     }
 
-    async function gerarExcel(dadosFibras, modeloFile, comprimento, operador) {
-        if (!dadosFibras.length) return;
-        const primeiro = dadosFibras[0];
-        const bobina = primeiro.bobina || `FIBER_${Date.now()}`;
-        const buffer = await modeloFile.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: 'array' });
+    // ========== PREENCHER EXCEL IGUAL AO ORIGINAL ==========
+    async function preencherExcel(dadosPorFibra, modeloFile, comprimentoBobina, operador, pastaDestinoNome) {
+        if (!dadosPorFibra.length) return null;
+        const primeiro = dadosPorFibra[0];
+        let bobina = primeiro.bobina || `ERRO_${Date.now()}`;
+        const nomeSaida = `BOBINA_${bobina}.xlsx`;
+        
+        // Carrega o modelo
+        const modeloBuffer = await modeloFile.arrayBuffer();
+        const workbook = XLSX.read(modeloBuffer, { type: 'array' });
         const ws = workbook.Sheets[workbook.SheetNames[0]];
         
-        const metragem = Math.floor(primeiro.distancia_final - comprimento);
+        const data = primeiro.data || "";
+        const lote = primeiro.lote || "";
+        const tipo = primeiro.tipo || "";
+        const metragemTotal = Math.floor(primeiro.distancia_final - comprimentoBobina);
         
-        const setCell = (ref, val) => { if (!ws[ref]) ws[ref] = { t: 's', v: val }; else ws[ref].v = val; };
-        setCell('A8', `BOBINA ${bobina}`);
-        setCell('E8', primeiro.data || '');
-        setCell('G11', metragem);
-        setCell('G10', primeiro.lote || '');
-        setCell('C9', primeiro.tipo || '');
-        setCell('A67', operador);
-        setCell('A63', `Testes OTDR executados nas direções AB e BA, utilizando Bobina de ${Math.floor(comprimento)}m.`);
+        // Escrita idêntica ao original com suporte a mesclagem
+        escreverEmMesclada(ws, "A8", `BOBINA ${bobina}`);
+        escreverEmMesclada(ws, "E8", data);
+        escreverEmMesclada(ws, "G11", metragemTotal);
+        escreverEmMesclada(ws, "G10", lote);
+        escreverEmMesclada(ws, "C9", tipo);
+        escreverEmMesclada(ws, "A67", operador);
+        const comentario = `Comentários: Os Teste foram executados nas direções AB e BA, utilizando Bobina de Testes de ${Math.floor(comprimentoBobina)} metros.`;
+        escreverEmMesclada(ws, "A63", comentario);
         
-        dadosFibras.sort((a,b) => a.fibra - b.fibra);
-        for (let i = 0; i < dadosFibras.length; i++) setCell(`E${15 + i}`, dadosFibras[i].declive);
+        // Ordena por fibra e escreve os declives
+        dadosPorFibra.sort((a,b) => a.fibra - b.fibra);
+        let linha = 15;
+        for (const item of dadosPorFibra) {
+            escreverEmMesclada(ws, `E${linha}`, item.declive);
+            linha++;
+        }
         
+        // Salva o workbook
         const newWb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(newWb, ws, workbook.SheetNames[0]);
         const wbout = XLSX.write(newWb, { bookType: 'xlsx', type: 'array' });
@@ -878,79 +790,84 @@
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.href = url;
+        
+        // Organiza dentro da pasta de destino com a data (simula a estrutura original)
         const hoje = new Date().toISOString().slice(0,10);
-        link.download = `FIBER_REPORTS_${hoje}/BOBINA_${bobina}.xlsx`;
+        const pastaFinal = pastaDestinoNome ? `${pastaDestinoNome}/PLANILHAS_PRE-LANCAMENTO-${hoje}` : `PLANILHAS_PRE-LANCAMENTO-${hoje}`;
+        link.download = `${pastaFinal}/${nomeSaida}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
+        return nomeSaida;
     }
 
+    // ========== PROCESSAMENTO PRINCIPAL ==========
     async function processar() {
-        if (state.executando) { setStatus('Processamento em andamento...', 'warning'); return; }
+        if (state.executando) { setStatus("Processamento já em andamento...", "warning"); return; }
         
         const operador = DOM.operador.value.trim();
-        const comprimento = parseFloat(DOM.comprimento.value);
+        const comprimentoVal = parseFloat(DOM.comprimento.value);
+        const pastaDestinoVal = DOM.pastaDestino.value || "downloads";
         
-        if (!operador) { setStatus('Preencha o nome do operador', 'error'); return; }
-        if (isNaN(comprimento) || comprimento <= 0) { setStatus('Comprimento inválido', 'error'); return; }
-        if (!state.pastaBaseFiles) { setStatus('Selecione a pasta PRE-LANÇAMENTO', 'error'); return; }
-        if (!state.modeloFile) { setStatus('Selecione o modelo Excel', 'error'); return; }
+        if (!operador) { setStatus("Preencha o nome do operador", "error"); return; }
+        if (isNaN(comprimentoVal) || comprimentoVal <= 0) { setStatus("Comprimento da bobina inválido", "error"); return; }
+        if (!state.pastaBaseFiles) { setStatus("Selecione a pasta PRE-LANÇAMENTO", "error"); return; }
+        if (!state.modeloFile) { setStatus("Selecione o modelo Excel", "error"); return; }
         
         state.executando = true;
         DOM.btnGerar.disabled = true;
-        setStatus('📡 Iniciando análise OTDR...', 'info');
+        setStatus("📡 Iniciando varredura OTDR...", "info");
         
         try {
             const files = Array.from(state.pastaBaseFiles);
-            const mapSubpastas = new Map();
-            
+            const mapPorSubpasta = new Map();
             for (const file of files) {
                 const partes = file.webkitRelativePath.split('/');
                 if (partes.length < 2) continue;
                 const subpasta = partes[0];
-                if (!mapSubpastas.has(subpasta)) mapSubpastas.set(subpasta, []);
-                if (file.name.toLowerCase().endsWith('.pdf')) mapSubpastas.get(subpasta).push(file);
+                if (!mapPorSubpasta.has(subpasta)) mapPorSubpasta.set(subpasta, []);
+                if (file.name.toLowerCase().endsWith('.pdf')) mapPorSubpasta.get(subpasta).push(file);
             }
             
-            const subpastas = Array.from(mapSubpastas.keys());
+            const subpastas = Array.from(mapPorSubpasta.keys());
             let totalPDFs = 0;
-            for (const pdfs of mapSubpastas.values()) totalPDFs += pdfs.length;
+            for (const pdfs of mapPorSubpasta.values()) totalPDFs += pdfs.length;
             
             DOM.metricFolders.innerText = subpastas.length;
             DOM.metricPDFs.innerText = totalPDFs;
             
-            if (subpastas.length === 0) throw new Error('Nenhuma subpasta com PDF encontrada');
+            if (subpastas.length === 0) throw new Error("Nenhuma subpasta com PDF encontrada.");
             
             let processadas = 0;
             for (const subpasta of subpastas) {
-                const pdfs = mapSubpastas.get(subpasta);
+                const pdfFiles = mapPorSubpasta.get(subpasta);
                 const dadosFibras = [];
-                
-                for (const pdf of pdfs) {
+                for (const pdfFile of pdfFiles) {
                     try {
-                        const dados = await extrairDadosPDF(pdf);
+                        const dados = await extrairDadosPDF(pdfFile);
                         dadosFibras.push(dados);
-                    } catch (e) { console.warn(`Erro em ${pdf.name}:`, e); }
+                    } catch (e) { console.warn(`Erro no PDF ${pdfFile.name}:`, e); }
                 }
-                
-                if (dadosFibras.length) await gerarExcel(dadosFibras, state.modeloFile, comprimento, operador);
+                if (dadosFibras.length) {
+                    await preencherExcel(dadosFibras, state.modeloFile, comprimentoVal, operador, pastaDestinoVal);
+                }
                 processadas++;
-                updateProgress(processadas, subpastas.length, `Processando: ${subpasta} (${processadas}/${subpastas.length})`);
+                updateProgress(processadas, subpastas.length, `Processando ${subpasta} (${processadas}/${subpastas.length})`);
             }
             
-            setStatus(`✅ Concluído! ${subpastas.length} pastas, ${totalPDFs} PDFs processados.`, 'success');
-            DOM.metricStatus.innerHTML = '✅ DONE';
+            setStatus(`✅ FINALIZADO! ${subpastas.length} pastas processadas, ${totalPDFs} PDFs.`, "success");
+            DOM.metricStatus.innerHTML = '✅ CONCLUÍDO';
         } catch (err) {
-            setStatus(`❌ Erro: ${err.message}`, 'error');
-            DOM.metricStatus.innerHTML = '⚠️ ERROR';
+            setStatus(`❌ Erro: ${err.message}`, "error");
+            DOM.metricStatus.innerHTML = '⚠️ ERRO';
         } finally {
             state.executando = false;
             DOM.btnGerar.disabled = false;
         }
     }
 
-    // Configurar seletores
+    // ========== CONFIGURAÇÃO DOS SELETORES DE ARQUIVO ==========
     function setupSelectors() {
         const baseInput = document.createElement('input');
         baseInput.type = 'file';
@@ -962,11 +879,11 @@
                 state.pastaBaseFiles = files;
                 const folderName = files[0].webkitRelativePath.split('/')[0];
                 DOM.pastaBase.value = folderName;
-                const pdfs = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.pdf')).length;
-                const folders = new Set(Array.from(files).map(f => f.webkitRelativePath.split('/')[0]));
-                DOM.metricFolders.innerText = folders.size;
-                DOM.metricPDFs.innerText = pdfs;
-                setStatus(`Pasta carregada: ${folders.size} subpastas, ${pdfs} PDFs`, 'success');
+                const pdfCount = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.pdf')).length;
+                const folderSet = new Set(Array.from(files).map(f => f.webkitRelativePath.split('/')[0]));
+                DOM.metricFolders.innerText = folderSet.size;
+                DOM.metricPDFs.innerText = pdfCount;
+                setStatus(`Pasta carregada: ${folderSet.size} subpastas, ${pdfCount} PDFs OTDR.`, "success");
             }
         };
         document.getElementById('btnSelectBase').onclick = () => baseInput.click();
@@ -978,7 +895,7 @@
             if (e.target.files.length) {
                 state.modeloFile = e.target.files[0];
                 DOM.modeloPath.value = state.modeloFile.name;
-                setStatus(`Modelo carregado: ${state.modeloFile.name}`, 'success');
+                setStatus(`Modelo carregado: ${state.modeloFile.name}`, "success");
             }
         };
         document.getElementById('btnSelectModelo').onclick = () => modeloInput.click();
@@ -988,8 +905,9 @@
         destinoInput.webkitdirectory = true;
         destinoInput.onchange = (e) => {
             if (e.target.files.length) {
-                DOM.pastaDestino.value = e.target.files[0].webkitRelativePath.split('/')[0];
-                setStatus('Pasta destino definida', 'info');
+                const destPath = e.target.files[0].webkitRelativePath.split('/')[0];
+                DOM.pastaDestino.value = destPath;
+                setStatus(`Pasta destino: ${destPath} (os arquivos serão salvos com essa estrutura)`, "info");
             }
         };
         document.getElementById('btnSelectDestino').onclick = () => destinoInput.click();
