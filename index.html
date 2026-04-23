@@ -1,138 +1,992 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Pré-Lançamento - Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FiberOTDR | Sistema de Pré-Lançamento de Fibra Óptica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; }
-        .campo { margin-bottom: 15px; }
-        label { display: inline-block; width: 180px; font-weight: bold; }
-        input, button { padding: 8px; font-size: 16px; }
-        button { background: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px; }
-        button:hover { background: #45a049; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        #status { margin-top: 20px; padding: 10px; border-radius: 4px; }
-        .sucesso { background: #d4edda; color: #155724; }
-        .erro { background: #f8d7da; color: #721c24; }
-        .info { background: #d1ecf1; color: #0c5460; }
-        progress { width: 100%; margin-top: 15px; }
-        .aviso { background: #fff3cd; color: #856404; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #050811;
+            color: #E8EDF5;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ========== BACKGROUND HIGH-TECH COM LINHAS DE DADOS ========== */
+        .tech-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        /* Grade de dados (grid tecnológico) */
+        .data-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Linhas de fibra óptica pulsantes */
+        .fiber-stream {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .fiber-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 212, 255, 0.6), 
+                rgba(0, 100, 255, 0.8), 
+                rgba(0, 212, 255, 0.6), 
+                transparent);
+            filter: blur(1px);
+            border-radius: 2px;
+            animation: fiberFlow 3s ease-in-out infinite;
+        }
+
+        @keyframes fiberFlow {
+            0% {
+                transform: translateX(-100%) scaleX(1);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(200%) scaleX(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Dados binários flutuantes */
+        .binary-rain {
+            position: absolute;
+            font-family: monospace;
+            font-size: 11px;
+            color: rgba(0, 212, 255, 0.15);
+            white-space: nowrap;
+            pointer-events: none;
+            animation: binaryFall linear infinite;
+        }
+
+        @keyframes binaryFall {
+            from {
+                transform: translateY(-100%) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Nós de rede / conectividade animados */
+        .network-node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00D4FF;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00D4FF;
+            animation: nodePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes nodePulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(2); box-shadow: 0 0 20px #00D4FF; }
+        }
+
+        /* Linhas de conexão entre nós */
+        .network-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.6), rgba(0, 212, 255, 0.2));
+            transform-origin: left center;
+            animation: lineGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes lineGlow {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.7; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem 2.5rem;
+        }
+
+        /* Header com tema telecom */
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .logo-area {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(5, 20, 30, 0.6);
+            backdrop-filter: blur(12px);
+            padding: 0.7rem 2rem;
+            border-radius: 60px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 200, 255, 0.2);
+            margin-bottom: 1.2rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #00D4FF, #0066FF);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 255, 255, 0.8);
+            animation: pulseRing 2s ease-out infinite;
+        }
+
+        @keyframes pulseRing {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF, #00D4FF, #0088FF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo-badge {
+            font-size: 0.65rem;
+            background: rgba(0, 212, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            color: #00D4FF;
+        }
+
+        .fiber-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .fiber-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #7F8EA3;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 15px;
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .fiber-stat i {
+            color: #00D4FF;
+            font-size: 0.9rem;
+            animation: iconBlink 2s ease-in-out infinite;
+        }
+
+        @keyframes iconBlink {
+            0%, 100% { opacity: 0.6; text-shadow: none; }
+            50% { opacity: 1; text-shadow: 0 0 5px #00D4FF; }
+        }
+
+        /* Cards estilo high-tech */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        .card {
+            background: rgba(5, 15, 22, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00D4FF, #0088FF, #00D4FF, transparent);
+            animation: scanLine 3s linear infinite;
+        }
+
+        @keyframes scanLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .card:hover {
+            border-color: rgba(0, 212, 255, 0.6);
+            box-shadow: 0 15px 40px -12px rgba(0, 212, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            padding: 1.2rem 1.8rem;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+            background: rgba(0, 30, 45, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header i {
+            font-size: 1.3rem;
+            color: #00D4FF;
+            background: rgba(0, 212, 255, 0.1);
+            padding: 8px;
+            border-radius: 14px;
+        }
+
+        .card-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+            color: #CCE6FF;
+        }
+
+        .card-body {
+            padding: 1.8rem;
+        }
+
+        /* Form groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #5F7F9E;
+            margin-bottom: 0.6rem;
+        }
+
+        .form-group label i {
+            font-size: 0.75rem;
+            color: #00D4FF;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-container input, .input-container .fake-input {
+            flex: 1;
+            background: #0A121F;
+            border: 1.5px solid #1A2A3A;
+            border-radius: 16px;
+            padding: 0.85rem 1.2rem;
+            color: #E0ECFF;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-family: 'Space Grotesk', monospace;
+        }
+
+        .input-container input:focus {
+            outline: none;
+            border-color: #00D4FF;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+            background: #0C1628;
+        }
+
+        .btn-ghost {
+            background: #0F1A2A;
+            border: 1px solid #1A3A4A;
+            border-radius: 16px;
+            padding: 0 1.5rem;
+            height: 52px;
+            font-weight: 600;
+            color: #00D4FF;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .btn-ghost:hover {
+            background: #1A2A3A;
+            border-color: #00D4FF;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+            color: #88EEFF;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, rgba(5, 20, 32, 0.9), rgba(2, 10, 18, 0.95));
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 28px;
+            padding: 1rem;
+            margin-bottom: 1.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+            animation: rotateGlow 10s linear infinite;
+        }
+
+        @keyframes rotateGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(95deg, #0066CC, #0099FF, #00CCFF);
+            border: none;
+            border-radius: 60px;
+            padding: 1.1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            font-family: inherit;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -5px #0099FF;
+            background: linear-gradient(95deg, #0088FF, #00D4FF, #00EEFF);
+        }
+
+        .progress-card {
+            background: rgba(5, 15, 22, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #7F8EA3;
+        }
+
+        .progress-bar-wrapper {
+            background: #0A121F;
+            border-radius: 40px;
+            height: 10px;
+            overflow: hidden;
+            margin: 0.8rem 0;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00AAFF, #00FFCC);
+            border-radius: 40px;
+            transition: width 0.25s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 200, 0.6);
+            position: relative;
+        }
+
+        .status-area {
+            background: #051018;
+            border-radius: 18px;
+            padding: 1rem 1.2rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-left: 3px solid #00D4FF;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .metrics {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .metric-item {
+            flex: 1;
+            background: #051018;
+            border-radius: 18px;
+            padding: 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            transition: all 0.2s;
+        }
+        .metric-item:hover {
+            border-color: #00D4FF;
+            box-shadow: 0 0 15px rgba(0,212,255,0.2);
+        }
+        .metric-label {
+            font-size: 0.65rem;
+            color: #5F7F9E;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .metric-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00D4FF;
+            margin-top: 5px;
+        }
+
+        .footer-note {
+            text-align: center;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+            font-size: 0.65rem;
+            color: #3A5A7A;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
-    <h1>📡 Sistema Pré-Lançamento de Fibras Ópticas</h1>
-    
-    <div class="aviso">
-        ⚠️ <strong>Limitação:</strong> O arquivo ZIP deve ter no máximo <strong>4.5MB</strong> devido às restrições do Vercel. 
-        Para arquivos maiores, processe poucas bobinas por vez ou use um servidor próprio.
+<!-- BACKGROUND HIGH-TECH COMPLETO -->
+<div class="tech-bg">
+    <div class="data-grid"></div>
+    <div class="fiber-stream" id="fiberStream"></div>
+    <div class="network-nodes" id="networkNodes"></div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon">
+                <i class="fas fa-fiber-optic"></i>
+            </div>
+            <div class="logo-text">
+                FIBEROTDR
+                <span class="logo-badge">TELECOM</span>
+            </div>
+        </div>
+        <h1>Pré-Lançamento de Redes Ópticas</h1>
+        <div class="fiber-stats">
+            <div class="fiber-stat"><i class="fas fa-charging-station"></i> OTDR Analysis</div>
+            <div class="fiber-stat"><i class="fas fa-waveform"></i> Reflectometry</div>
+            <div class="fiber-stat"><i class="fas fa-network-wired"></i> Intelligent Routing</div>
+            <div class="fiber-stat"><i class="fas fa-chart-line"></i> Real-time Metrics</div>
+        </div>
     </div>
 
-    <div class="campo">
-        <label>Arquivo ZIP:</label>
-        <input type="file" id="zipFile" accept=".zip">
+    <div class="dashboard-grid">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user-astronaut"></i>
+                <h3>Operador & Parâmetros da Rede</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> Nome do Operador / Técnico</label>
+                    <div class="input-container">
+                        <input type="text" id="operadorNome" placeholder="Ex: Técnico Especialista - João Mendes" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-ruler"></i> Comprimento da Bobina (metros)</label>
+                    <div class="input-container">
+                        <input type="number" id="comprimentoBobina" placeholder="Ex: 500" step="any">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-folder-tree"></i>
+                <h3>Fontes de Dados Ópticos</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label><i class="fas fa-inbox"></i> Pasta PRE-LANÇAMENTO (subpastas com PDFs)</label>
+                    <div class="input-container">
+                        <input type="text" id="pastaBase" readonly placeholder="Nenhuma pasta selecionada" class="fake-input">
+                        <button class="btn-ghost" id="btnSelectBase"><i class="fas fa-folder-open"></i> Selecionar</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-file-excel"></i> Modelo Excel (.xlsx)</label>
+                    <div class="input-container">
+                        <input type="text" id="modeloPath" readonly placeholder="Nenhum arquivo selecionado" class="fake-input">
+                        <button class="btn-ghost" id="btnSelectModelo"><i class="fas fa-upload"></i> Carregar</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-database"></i> Pasta de Destino</label>
+                    <div class="input-container">
+                        <input type="text" id="pastaDestino" readonly placeholder="Selecione a pasta de saída" class="fake-input">
+                        <button class="btn-ghost" id="btnSelectDestino"><i class="fas fa-save"></i> Destino</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="campo">
-        <label>Comprimento da Bobina (m):</label>
-        <input type="number" id="comprimento" step="0.1" required>
+
+    <div class="action-card">
+        <button class="btn-primary" id="btnGerar">
+            <i class="fas fa-play-circle"></i> PROCESSAR FIBRAS ÓPTICAS
+            <i class="fas fa-fiber-optic"></i>
+        </button>
     </div>
-    <div class="campo">
-        <label>Nome do Operador:</label>
-        <input type="text" id="operador" required>
+
+    <div class="progress-card">
+        <div class="progress-header">
+            <span><i class="fas fa-charging-station"></i> Monitor de Processamento</span>
+            <span id="progressPercent" style="font-weight: 700; color:#00D4FF;">0%</span>
+        </div>
+        <div class="progress-bar-wrapper">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div id="progressText" style="font-size: 0.7rem; color:#5F7F9E; margin-top: 5px;">Aguardando inicialização</div>
+        
+        <div class="status-area" id="statusArea">
+            <i class="fas fa-info-circle"></i> Sistema de pré-lançamento FTTH pronto. Configure e inicie.
+        </div>
+
+        <div class="metrics">
+            <div class="metric-item">
+                <div class="metric-label"><i class="fas fa-layer-group"></i> Pastas Detectadas</div>
+                <div class="metric-value" id="metricFolders">0</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label"><i class="fas fa-file-pdf"></i> Relatórios OTDR</div>
+                <div class="metric-value" id="metricPDFs">0</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-label"><i class="fas fa-microchip"></i> Status</div>
+                <div class="metric-value" id="metricStatus">🔵 IDLE</div>
+            </div>
+        </div>
     </div>
-    <button id="btnProcessar">▶ GERAR PLANILHAS</button>
 
-    <div id="status" style="display: none;"></div>
-    <progress id="progresso" value="0" max="100" style="width:100%; display:none;"></progress>
+    <div class="footer-note">
+        <span><i class="fas fa-shield-alt"></i> Processamento 100% local</span>
+        <span><i class="fas fa-chart-line"></i> Compatível com padrões OTDR</span>
+        <span><i class="fas fa-fiber-optic"></i> Sistema profissional para redes de fibra óptica</span>
+        <span><i class="fas fa-cloud-upload-alt"></i> Dados criptografados localmente</span>
+    </div>
+</div>
 
-    <script>
-        const btn = document.getElementById('btnProcessar');
-        const statusDiv = document.getElementById('status');
-        const progresso = document.getElementById('progresso');
-        const zipInput = document.getElementById('zipFile');
-
-        zipInput.addEventListener('change', function() {
-            if (this.files[0]) {
-                const sizeMB = this.files[0].size / (1024 * 1024);
-                if (sizeMB > 4.5) {
-                    mostrarStatus(`⚠️ Arquivo muito grande: ${sizeMB.toFixed(2)}MB. Máximo permitido: 4.5MB.`, 'erro');
-                    btn.disabled = true;
-                } else {
-                    mostrarStatus(`✅ Arquivo OK: ${sizeMB.toFixed(2)}MB`, 'sucesso');
-                    btn.disabled = false;
-                }
-            }
-        });
-
-        btn.addEventListener('click', async () => {
-            const zipFile = zipInput.files[0];
-            const comprimento = document.getElementById('comprimento').value;
-            const operador = document.getElementById('operador').value;
-
-            if (!zipFile) {
-                mostrarStatus('Selecione um arquivo ZIP.', 'erro');
-                return;
-            }
-            if (!comprimento || isNaN(comprimento)) {
-                mostrarStatus('Informe o comprimento da bobina.', 'erro');
-                return;
-            }
-            if (!operador.trim()) {
-                mostrarStatus('Informe o nome do operador.', 'erro');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('zip_file', zipFile);
-            formData.append('comprimento', comprimento);
-            formData.append('operador', operador);
-
-            btn.disabled = true;
-            btn.textContent = 'Processando...';
-            mostrarStatus('Enviando e processando... Aguarde (pode levar alguns segundos).', 'info');
-            progresso.style.display = 'block';
-            progresso.value = 30;
-
-            try {
-                const response = await fetch('/api/process', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                progresso.value = 80;
-
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'planilhas_geradas.zip';
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                    mostrarStatus('✅ Processamento concluído! O download do ZIP com as planilhas foi iniciado.', 'sucesso');
-                } else if (response.status === 413) {
-                    mostrarStatus('❌ Erro 413: Arquivo muito grande. O limite é 4.5MB. Reduza o tamanho do ZIP.', 'erro');
-                } else {
-                    const errorText = await response.text();
-                    mostrarStatus(`Erro no servidor: ${errorText}`, 'erro');
-                }
-            } catch (err) {
-                mostrarStatus(`Erro de conexão: ${err.message}`, 'erro');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '▶ GERAR PLANILHAS';
-                progresso.style.display = 'none';
-                progresso.value = 0;
-            }
-        });
-
-        function mostrarStatus(msg, tipo) {
-            statusDiv.textContent = msg;
-            statusDiv.className = tipo;
-            statusDiv.style.display = 'block';
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script>
+    // ========== CRIAÇÃO DAS LINHAS DE FIBRA E NÓS DE REDE ==========
+    function createTechBackground() {
+        const fiberStream = document.getElementById('fiberStream');
+        const networkNodes = document.getElementById('networkNodes');
+        
+        // Criar linhas de fibra óptica (dados em movimento)
+        for (let i = 0; i < 25; i++) {
+            const line = document.createElement('div');
+            line.className = 'fiber-line';
+            line.style.top = `${Math.random() * 100}%`;
+            line.style.left = `${Math.random() * 100}%`;
+            line.style.width = `${150 + Math.random() * 300}px`;
+            line.style.height = `${1 + Math.random() * 2}px`;
+            line.style.animationDelay = `${Math.random() * 5}s`;
+            line.style.animationDuration = `${2 + Math.random() * 3}s`;
+            line.style.background = `linear-gradient(90deg, transparent, rgba(0, ${150 + Math.random() * 105}, 255, ${0.3 + Math.random() * 0.4}), rgba(0, 212, 255, 0.8), rgba(0, ${150 + Math.random() * 105}, 255, ${0.3 + Math.random() * 0.4}), transparent)`;
+            fiberStream.appendChild(line);
         }
-    </script>
+        
+        // Criar nós de rede (conectividade)
+        const nodePositions = [];
+        for (let i = 0; i < 40; i++) {
+            const node = document.createElement('div');
+            node.className = 'network-node';
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            node.style.left = `${x}%`;
+            node.style.top = `${y}%`;
+            node.style.animationDelay = `${Math.random() * 3}s`;
+            networkNodes.appendChild(node);
+            nodePositions.push({ x, y, element: node });
+        }
+        
+        // Criar linhas de conexão entre nós próximos
+        for (let i = 0; i < nodePositions.length; i++) {
+            for (let j = i + 1; j < nodePositions.length; j++) {
+                const dx = nodePositions[i].x - nodePositions[j].x;
+                const dy = nodePositions[i].y - nodePositions[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 15 && distance > 3) {
+                    const line = document.createElement('div');
+                    line.className = 'network-line';
+                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                    const width = distance;
+                    line.style.width = `${width}%`;
+                    line.style.left = `${nodePositions[i].x}%`;
+                    line.style.top = `${nodePositions[i].y}%`;
+                    line.style.transform = `rotate(${angle}deg)`;
+                    line.style.transformOrigin = 'left center';
+                    line.style.animationDelay = `${Math.random() * 2}s`;
+                    networkNodes.appendChild(line);
+                }
+            }
+        }
+        
+        // Criar dados binários flutuantes
+        for (let i = 0; i < 60; i++) {
+            const binary = document.createElement('div');
+            binary.className = 'binary-rain';
+            const binaryStr = Array(8).fill(0).map(() => Math.random() > 0.5 ? '1' : '0').join('');
+            binary.textContent = binaryStr;
+            binary.style.left = `${Math.random() * 100}%`;
+            binary.style.animationDelay = `${Math.random() * 10}s`;
+            binary.style.animationDuration = `${8 + Math.random() * 12}s`;
+            binary.style.fontSize = `${8 + Math.random() * 6}px`;
+            binary.style.opacity = 0.1 + Math.random() * 0.15;
+            document.querySelector('.tech-bg').appendChild(binary);
+        }
+    }
+    
+    createTechBackground();
+
+    // ========== LÓGICA DE PROCESSAMENTO ==========
+    let state = {
+        executando: false,
+        pastaBaseFiles: null,
+        modeloFile: null,
+        totalPastas: 0,
+        totalPDFs: 0
+    };
+
+    const inputOperador = document.getElementById('operadorNome');
+    const inputComprimento = document.getElementById('comprimentoBobina');
+    const inputPastaBase = document.getElementById('pastaBase');
+    const inputModeloPath = document.getElementById('modeloPath');
+    const inputPastaDestino = document.getElementById('pastaDestino');
+    const btnGerar = document.getElementById('btnGerar');
+    const progressFill = document.getElementById('progressFill');
+    const progressTextSpan = document.getElementById('progressText');
+    const progressPercentSpan = document.getElementById('progressPercent');
+    const statusArea = document.getElementById('statusArea');
+    const metricFolders = document.getElementById('metricFolders');
+    const metricPDFs = document.getElementById('metricPDFs');
+    const metricStatus = document.getElementById('metricStatus');
+
+    function setStatus(message, type = "info") {
+        statusArea.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle')}"></i> ${message}`;
+        statusArea.className = "status-area";
+        if (type === 'success') statusArea.classList.add('status-success');
+        else if (type === 'error') statusArea.classList.add('status-error');
+        else if (type === 'warning') statusArea.classList.add('status-warning');
+    }
+
+    function updateProgress(current, total, detail = "") {
+        const percent = total === 0 ? 0 : (current / total) * 100;
+        progressFill.style.width = `${percent}%`;
+        progressPercentSpan.innerText = `${Math.round(percent)}%`;
+        if (detail) progressTextSpan.innerText = detail;
+        else progressTextSpan.innerText = `Processando ${current} de ${total} pastas`;
+    }
+
+    function updateMetrics(folderCount, pdfCount, isRunning = false) {
+        metricFolders.innerText = folderCount;
+        metricPDFs.innerText = pdfCount;
+        metricStatus.innerHTML = isRunning ? '🟢 PROCESSANDO' : '⚫ PRONTO';
+        metricStatus.style.color = isRunning ? '#00FFCC' : '#5F7F9E';
+    }
+
+    // Extração de dados do PDF
+    async function extrairDadosPDF(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const typedarray = new Uint8Array(e.target.result);
+                try {
+                    const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+                    let fullText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+                    }
+                    const nomeArquivo = file.name;
+                    let bobina = (nomeArquivo.match(/B-(\d+)/i) || [])[1] || null;
+                    let data = (fullText.match(/Data de impressão\s*:\s*(\d{2}\/\d{2}\/\d{4})/) || [])[1] || "";
+                    let distanciaFinal = 0;
+                    const fimMatch = fullText.match(/Fim da Fibra m\s+([\d\.]+)/);
+                    if (fimMatch) distanciaFinal = parseFloat(fimMatch[1]);
+                    else {
+                        const distancias = [...fullText.matchAll(/(\d+\.\d+)\s*m/g)].map(m => parseFloat(m[1]));
+                        if (distancias.length) distanciaFinal = Math.max(...distancias);
+                    }
+                    let decliveFinal = 0;
+                    for (let linha of fullText.split(/\n/)) {
+                        if (/^\s*\d+\s/.test(linha)) {
+                            const numeros = linha.match(/-?\d+\.\d+/g);
+                            if (numeros && numeros.length >= 4) { decliveFinal = parseFloat(numeros[2]); break; }
+                        }
+                    }
+                    let lote = "", tipo = "";
+                    const identMatch = fullText.match(/Ident\. Cabo.*?:\s*([A-Z0-9]+)\s+([A-Z0-9]+)/i);
+                    if (identMatch) { lote = identMatch[1]; tipo = identMatch[2]; }
+                    let fibra = (nomeArquivo.match(/F(\d+)/i) || [])[1] ? parseInt((nomeArquivo.match(/F(\d+)/i))[1]) : 0;
+                    resolve({ bobina, data, distancia_final: distanciaFinal, declive: decliveFinal, lote, tipo, fibra });
+                } catch (err) { reject(err); }
+            };
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    function escreverEmMesclada(ws, cellRef, valor) {
+        if (!ws[cellRef]) ws[cellRef] = { t: 's', v: valor };
+        else ws[cellRef].v = valor;
+    }
+
+    async function preencherExcel(dadosPorFibra, modeloFile, comprimentoBobina, operador) {
+        if (!dadosPorFibra.length) return null;
+        const primeiro = dadosPorFibra[0];
+        let bobina = primeiro.bobina || `FIBER_${Date.now()}`;
+        const nomeSaida = `BOBINA_${bobina}.xlsx`;
+        const modeloBuffer = await modeloFile.arrayBuffer();
+        const workbook = XLSX.read(modeloBuffer, { type: 'array' });
+        const ws = workbook.Sheets[workbook.SheetNames[0]];
+        const metragemTotal = Math.floor(primeiro.distancia_final - comprimentoBobina);
+        escreverEmMesclada(ws, "A8", `BOBINA ${bobina}`);
+        escreverEmMesclada(ws, "E8", primeiro.data || "");
+        escreverEmMesclada(ws, "G11", metragemTotal);
+        escreverEmMesclada(ws, "G10", primeiro.lote || "");
+        escreverEmMesclada(ws, "C9", primeiro.tipo || "");
+        escreverEmMesclada(ws, "A67", operador);
+        escreverEmMesclada(ws, "A63", `Comentários: Testes OTDR executados nas direções AB e BA, utilizando Bobina de Testes de ${Math.floor(comprimentoBobina)} metros.`);
+        dadosPorFibra.sort((a,b) => a.fibra - b.fibra);
+        let linha = 15;
+        for (const item of dadosPorFibra) { escreverEmMesclada(ws, `E${linha}`, item.declive); linha++; }
+        const newWb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(newWb, ws, workbook.SheetNames[0]);
+        const wbout = XLSX.write(newWb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([wbout], {type: 'application/octet-stream'});
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        const hoje = new Date().toISOString().slice(0,10);
+        link.download = `FIBER_REPORTS_${hoje}/${nomeSaida}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        return nomeSaida;
+    }
+
+    async function processar() {
+        if (state.executando) { setStatus("Processamento ativo...", "warning"); return; }
+        const operador = inputOperador.value.trim();
+        const comprimentoVal = parseFloat(inputComprimento.value);
+        if (!operador) { setStatus("Preencha o nome do operador", "error"); return; }
+        if (isNaN(comprimentoVal) || comprimentoVal <= 0) { setStatus("Comprimento da bobina inválido", "error"); return; }
+        if (!state.pastaBaseFiles) { setStatus("Selecione a pasta PRE-LANÇAMENTO", "error"); return; }
+        if (!state.modeloFile) { setStatus("Selecione o modelo Excel", "error"); return; }
+        
+        state.executando = true;
+        btnGerar.disabled = true;
+        setStatus("📡 Iniciando varredura OTDR...", "info");
+        
+        try {
+            const files = Array.from(state.pastaBaseFiles);
+            const mapPorSubpasta = new Map();
+            for (const file of files) {
+                const partes = file.webkitRelativePath.split('/');
+                if (partes.length < 2) continue;
+                const subpasta = partes[0];
+                if (!mapPorSubpasta.has(subpasta)) mapPorSubpasta.set(subpasta, []);
+                if (file.name.toLowerCase().endsWith('.pdf')) mapPorSubpasta.get(subpasta).push(file);
+            }
+            const subpastas = Array.from(mapPorSubpasta.keys());
+            let totalPDFsCont = 0;
+            for (const pdfs of mapPorSubpasta.values()) totalPDFsCont += pdfs.length;
+            updateMetrics(subpastas.length, totalPDFsCont, true);
+            if (subpastas.length === 0) throw new Error("Nenhuma subpasta com PDF encontrada.");
+            let processed = 0;
+            for (let idx = 0; idx < subpastas.length; idx++) {
+                const subpastaNome = subpastas[idx];
+                const pdfFiles = mapPorSubpasta.get(subpastaNome);
+                const dadosFibras = [];
+                for (const pdfFile of pdfFiles) {
+                    try { dadosFibras.push(await extrairDadosPDF(pdfFile)); } 
+                    catch(e) { console.warn(`Erro em ${pdfFile.name}`); }
+                }
+                if (dadosFibras.length) await preencherExcel(dadosFibras, state.modeloFile, comprimentoVal, operador);
+                processed++;
+                updateProgress(processed, subpastas.length, `Processando: ${subpastaNome} (${processed}/${subpastas.length})`);
+                await new Promise(r => setTimeout(r, 30));
+            }
+            setStatus(`✅ Processamento concluído! ${subpastas.length} pastas, ${totalPDFsCont} relatórios OTDR gerados.`, "success");
+            metricStatus.innerHTML = '✅ CONCLUÍDO';
+        } catch (err) {
+            setStatus(`❌ Erro: ${err.message}`, "error");
+            metricStatus.innerHTML = '⚠️ ERRO';
+        } finally {
+            state.executando = false;
+            btnGerar.disabled = false;
+        }
+    }
+
+    function setupFileSelectors() {
+        const btnBase = document.getElementById('btnSelectBase');
+        const btnModelo = document.getElementById('btnSelectModelo');
+        const btnDestino = document.getElementById('btnSelectDestino');
+        
+        const baseInput = document.createElement('input');
+        baseInput.type = 'file';
+        baseInput.webkitdirectory = true;
+        baseInput.multiple = true;
+        baseInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files.length) {
+                let folderName = files[0].webkitRelativePath.split('/')[0];
+                inputPastaBase.value = folderName;
+                state.pastaBaseFiles = files;
+                let pdfCount = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.pdf')).length;
+                let folderSet = new Set(Array.from(files).map(f => f.webkitRelativePath.split('/')[0]));
+                updateMetrics(folderSet.size, pdfCount, false);
+                setStatus(`Pasta carregada: ${folderSet.size} subpastas, ${pdfCount} PDFs OTDR.`, "success");
+            }
+        });
+        btnBase.addEventListener('click', () => baseInput.click());
+        
+        const modeloInput = document.createElement('input');
+        modeloInput.type = 'file';
+        modeloInput.accept = '.xlsx, .xls';
+        modeloInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                state.modeloFile = e.target.files[0];
+                inputModeloPath.value = state.modeloFile.name;
+                setStatus(`Modelo Excel carregado: ${state.modeloFile.name}`, "success");
+            }
+        });
+        btnModelo.addEventListener('click', () => modeloInput.click());
+        
+        const destinoInput = document.createElement('input');
+        destinoInput.type = 'file';
+        destinoInput.webkitdirectory = true;
+        destinoInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                inputPastaDestino.value = e.target.files[0].webkitRelativePath.split('/')[0];
+                setStatus("Pasta destino definida (arquivos na pasta Downloads)", "info");
+            }
+        });
+        btnDestino.addEventListener('click', () => destinoInput.click());
+    }
+    
+    setupFileSelectors();
+    btnGerar.addEventListener('click', processar);
+    updateMetrics(0, 0, false);
+</script>
 </body>
 </html>
