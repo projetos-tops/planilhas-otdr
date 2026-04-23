@@ -5,7 +5,7 @@ import tempfile
 import shutil
 import datetime
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, HTMLResponse
 from openpyxl import load_workbook
 from openpyxl.utils import range_boundaries
 import pdfplumber
@@ -91,6 +91,7 @@ def preencher_excel(dados_por_fibra, modelo_excel, pasta_saida, comprimento_bobi
     escrever_em_mesclada(ws, "G10", primeiro["lote"])
     escrever_em_mesclada(ws, "C9", primeiro["tipo"])
     escrever_em_mesclada(ws, "A67", operador)
+    
     comentario = f"Comentários: Os Teste foram executados nas direções AB e BA, utilizando Bobina de Testes de {int(comprimento_bobina)} metros."
     escrever_em_mesclada(ws, "A63", comentario)
 
@@ -105,46 +106,37 @@ def preencher_excel(dados_por_fibra, modelo_excel, pasta_saida, comprimento_bobi
 
 @app.post("/api/process")
 async def processar(
-    zip: UploadFile = File(...),
+    zip_file: UploadFile = File(...),
     comprimento: float = Form(...),
     operador: str = Form(...)
 ):
-    if not zip.filename.endswith('.zip'):
+    if not zip_file.filename.endswith('.zip'):
         raise HTTPException(400, "O arquivo enviado deve ser um ZIP.")
 
-    # Diretórios temporários
     temp_dir = tempfile.mkdtemp()
     extract_dir = os.path.join(temp_dir, "extraido")
     output_dir = os.path.join(temp_dir, "planilhas")
     modelo_path = None
 
     try:
-        # Salvar ZIP recebido
         zip_path = os.path.join(temp_dir, "upload.zip")
         with open(zip_path, "wb") as f:
-            f.write(await zip.read())
+            f.write(await zip_file.read())
 
-        # Extrair ZIP
         with zipfile.ZipFile(zip_path, 'r') as zf:
             zf.extractall(extract_dir)
 
-        # Procurar pelo modelo Excel dentro da estrutura extraída
-        # Espera-se que o ZIP contenha um arquivo modelo (ex: modelo.xlsx) e a pasta PRE-LANÇAMENTO
-        modelo_candidato = None
         for root, dirs, files in os.walk(extract_dir):
             for file in files:
                 if file.endswith('.xlsx') and 'modelo' in file.lower():
-                    modelo_candidato = os.path.join(root, file)
+                    modelo_path = os.path.join(root, file)
                     break
-            if modelo_candidato:
+            if modelo_path:
                 break
 
-        if not modelo_candidato:
-            raise HTTPException(400, "Nenhum arquivo modelo Excel (contendo 'modelo' no nome) foi encontrado no ZIP.")
+        if not modelo_path:
+            raise HTTPException(400, "Nenhum arquivo modelo Excel foi encontrado no ZIP.")
 
-        modelo_path = modelo_candidato
-
-        # Encontrar a pasta PRE-LANÇAMENTO (pode estar em qualquer nível)
         pre_lancamento_dir = None
         for root, dirs, files in os.walk(extract_dir):
             if os.path.basename(root) == "PRE-LANÇAMENTO":
@@ -152,9 +144,8 @@ async def processar(
                 break
 
         if not pre_lancamento_dir:
-            raise HTTPException(400, "O ZIP deve conter uma pasta chamada 'PRE-LANÇAMENTO' com as subpastas das bobinas.")
+            raise HTTPException(400, "O ZIP deve conter uma pasta chamada 'PRE-LANÇAMENTO'")
 
-        # Listar subpastas (cada uma = uma bobina)
         pastas_bobinas = [p for p in os.listdir(pre_lancamento_dir) if os.path.isdir(os.path.join(pre_lancamento_dir, p))]
         if not pastas_bobinas:
             raise HTTPException(400, "Nenhuma subpasta (bobina) encontrada dentro de PRE-LANÇAMENTO.")
@@ -178,7 +169,6 @@ async def processar(
             if dados_fibras:
                 preencher_excel(dados_fibras, modelo_path, output_dir, comprimento, operador)
 
-        # Compactar todos os Excels gerados
         zip_output = os.path.join(temp_dir, "resultado.zip")
         with zipfile.ZipFile(zip_output, 'w') as zf:
             for root, dirs, files in os.walk(output_dir):
@@ -188,7 +178,6 @@ async def processar(
                         arcname = os.path.relpath(full_path, output_dir)
                         zf.write(full_path, arcname)
 
-        # Retornar o ZIP
         def iterfile():
             with open(zip_output, 'rb') as f:
                 yield from f
@@ -202,5 +191,12 @@ async def processar(
     except Exception as e:
         raise HTTPException(500, str(e))
     finally:
-        # Limpeza dos arquivos temporários
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+@app.get("/")
+async def root():
+    index_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "index.html")
+    if os.path.exists(index_path):
+        with open(index_path, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(content="<h1>Index.html não encontrado</h1>", status_code=404)
