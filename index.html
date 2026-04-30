@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FiberOTDR | Pré-Lançamento de Fibra Óptica</title>
+    <title>FiberOTDR | Sistema de Pré-Lançamento (versão corrigida)</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
+        /* Mesmo estilo anterior, compactado */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Space Grotesk', sans-serif; background: #050811; color: #E8EDF5; position: relative; overflow-x: hidden; }
         .tech-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
@@ -54,10 +55,11 @@
         .action-card { background: linear-gradient(135deg, rgba(5,20,32,0.9), rgba(2,10,18,0.95)); border: 1px solid rgba(0,212,255,0.5); border-radius: 28px; padding: 1rem; margin-bottom: 1.8rem; position: relative; overflow: hidden; }
         .action-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%); animation: rotateGlow 10s linear infinite; }
         @keyframes rotateGlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .btn-primary { width:100%; background: linear-gradient(95deg,#0066CC,#0099FF,#00CCFF); border:none; border-radius:60px; padding:1.1rem; font-size:1rem; font-weight:700; color:white; cursor:pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap:14px; z-index:2; position:relative; }
+        .btn-primary { width:100%; background: linear-gradient(95deg,#0066CC,#0099FF,#00CCFF); border:none; border-radius:60px; padding:1.1rem; font-size:1rem; font-weight:700; color:white; cursor:pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap:14px; z-index:2; position:relative; margin-bottom: 10px; }
         .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px -5px #0099FF; background: linear-gradient(95deg,#0088FF,#00D4FF,#00EEFF); }
-        .btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
-        .progress-card { background: rgba(5,15,22,0.85); backdrop-filter: blur(12px); border-radius: 24px; border:1px solid rgba(0,212,255,0.3); padding:1.5rem; }
+        .btn-secondary { width:100%; background: linear-gradient(95deg,#2c3e66,#1a2a4a); border:none; border-radius:60px; padding:0.8rem; font-size:0.9rem; font-weight:600; color:white; cursor:pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap:10px; }
+        .btn-secondary:hover { transform: translateY(-2px); background: linear-gradient(95deg,#3a4e7a,#2a3a5a); }
+        .progress-card { background: rgba(5,15,22,0.85); backdrop-filter: blur(12px); border-radius: 24px; border:1px solid rgba(0,212,255,0.3); padding:1.5rem; margin-top: 1rem; }
         .progress-header { display:flex; justify-content:space-between; margin-bottom:1rem; font-size:0.8rem; color:#7F8EA3; }
         .progress-bar-wrapper { background:#0A121F; border-radius:40px; height:10px; overflow:hidden; margin:0.8rem 0; }
         .progress-fill { width:0%; height:100%; background:linear-gradient(90deg,#00AAFF,#00FFCC); border-radius:40px; transition:width 0.25s ease; box-shadow:0 0 10px rgba(0,255,200,0.6); }
@@ -81,18 +83,21 @@
         <div class="fiber-stats"><div class="fiber-stat"><i class="fas fa-charging-station"></i> OTDR Analysis</div><div class="fiber-stat"><i class="fas fa-waveform"></i> Reflectometry</div><div class="fiber-stat"><i class="fas fa-network-wired"></i> Intelligent Routing</div></div>
     </div>
     <div class="dashboard-grid">
-        <div class="card"><div class="card-header"><i class="fas fa-user-astronaut"></i><h3>Operador & Parâmetros</h3></div><div class="card-body"><div class="form-group"><label><i class="fas fa-id-card"></i> Nome do Operador</label><div class="input-container"><input type="text" id="operadorNome" placeholder="Ex: João Silva - Equipe OTDR"></div></div><div class="form-group"><label><i class="fas fa-ruler"></i> Comprimento da Bobina (metros)</label><div class="input-container"><input type="number" id="comprimentoBobina" placeholder="Ex: 500" step="any" value="500"></div></div></div></div>
+        <div class="card"><div class="card-header"><i class="fas fa-user-astronaut"></i><h3>Operador & Parâmetros</h3></div><div class="card-body"><div class="form-group"><label><i class="fas fa-id-card"></i> Nome do Operador</label><div class="input-container"><input type="text" id="operadorNome" placeholder="Ex: João Silva" value="alair"></div></div><div class="form-group"><label><i class="fas fa-ruler"></i> Comprimento da Bobina (metros)</label><div class="input-container"><input type="number" id="comprimentoBobina" value="2007" step="any"></div></div></div></div>
         <div class="card"><div class="card-header"><i class="fas fa-folder-tree"></i><h3>Fontes de Dados</h3></div><div class="card-body"><div class="form-group"><label><i class="fas fa-inbox"></i> Pasta PRE-LANÇAMENTO (com subpastas)</label><div class="input-container"><input type="text" id="pastaBase" readonly placeholder="Nenhuma pasta selecionada" class="fake-input"><button class="btn-ghost" id="btnSelectBase"><i class="fas fa-folder-open"></i> Selecionar</button></div></div><div class="form-group"><label><i class="fas fa-file-excel"></i> Modelo Excel (.xlsx)</label><div class="input-container"><input type="text" id="modeloPath" readonly placeholder="Nenhum arquivo selecionado" class="fake-input"><button class="btn-ghost" id="btnSelectModelo"><i class="fas fa-upload"></i> Carregar</button></div></div></div></div>
     </div>
-    <div class="action-card"><button class="btn-primary" id="btnGerar"><i class="fas fa-play-circle"></i> PROCESSAR E GERAR ZIP <i class="fas fa-file-archive"></i></button></div>
+    <div class="action-card">
+        <button class="btn-primary" id="btnGerarZip"><i class="fas fa-file-archive"></i> PROCESSAR E GERAR ZIP</button>
+        <button class="btn-secondary" id="btnTestarIndividual"><i class="fas fa-flask"></i> TESTAR: Gerar 1 Excel (sem ZIP)</button>
+    </div>
     <div class="progress-card"><div class="progress-header"><span><i class="fas fa-charging-station"></i> Monitor</span><span id="progressPercent">0%</span></div><div class="progress-bar-wrapper"><div class="progress-fill" id="progressFill"></div></div><div id="progressText" style="font-size:0.7rem;color:#5F7F9E;">Aguardando início</div><div class="status-area" id="statusArea"><i class="fas fa-info-circle"></i> Configure e clique em PROCESSAR.</div><div class="metrics"><div class="metric-item"><div class="metric-label"><i class="fas fa-layer-group"></i> Pastas</div><div class="metric-value" id="metricFolders">0</div></div><div class="metric-item"><div class="metric-label"><i class="fas fa-file-pdf"></i> PDFs</div><div class="metric-value" id="metricPDFs">0</div></div><div class="metric-item"><div class="metric-label"><i class="fas fa-microchip"></i> Status</div><div class="metric-value" id="metricStatus">⚫ IDLE</div></div></div></div>
-    <div class="footer-note"><span><i class="fas fa-shield-alt"></i> Processamento local</span><span><i class="fas fa-file-archive"></i> Resultados em um único ZIP</span></div>
+    <div class="footer-note"><span><i class="fas fa-shield-alt"></i> Processamento local</span><span><i class="fas fa-file-archive"></i> Resultados em ZIP</span><span><i class="fas fa-bug"></i> Use o botão TESTAR para diagnosticar</span></div>
 </div>
 
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
-    // Fundo high-tech (mesmo de antes)
+    // Fundo high-tech (mantido)
     (function createTechBackground() {
         const container = document.getElementById('techBg');
         for (let i=0;i<20;i++) { let l=document.createElement('div'); l.className='fiber-line'; l.style.top=Math.random()*100+'%'; l.style.left=Math.random()*100+'%'; l.style.width=150+Math.random()*250+'px'; l.style.animationDelay=Math.random()*5+'s'; container.appendChild(l); }
@@ -108,7 +113,8 @@
         comprimento: document.getElementById('comprimentoBobina'),
         pastaBase: document.getElementById('pastaBase'),
         modeloPath: document.getElementById('modeloPath'),
-        btnGerar: document.getElementById('btnGerar'),
+        btnGerarZip: document.getElementById('btnGerarZip'),
+        btnTestar: document.getElementById('btnTestarIndividual'),
         progressFill: document.getElementById('progressFill'),
         progressText: document.getElementById('progressText'),
         progressPercent: document.getElementById('progressPercent'),
@@ -133,39 +139,40 @@
         DOM.progressText.innerText = detail || `Processando ${current} de ${total} pastas`;
     }
 
-    // ================= FUNÇÃO DE ESCRITA EM CÉLULAS MESCLADAS =================
+    // Função para escrever em célula mesclada (melhorada)
     function escreverEmMesclada(ws, cellRef, valor) {
         const match = cellRef.match(/([A-Z]+)(\d+)/);
         if (!match) return;
         const col = match[1];
         const row = parseInt(match[2]);
+        // Converte número da coluna (ex: 'E' -> 5)
+        const colIndex = col.charCodeAt(0) - 65;
         if (ws['!merges']) {
             for (let merge of ws['!merges']) {
                 const startRow = merge.s.r + 1;
                 const endRow = merge.e.r + 1;
-                const startCol = String.fromCharCode(65 + merge.s.c);
-                const endCol = String.fromCharCode(65 + merge.e.c);
-                if (row >= startRow && row <= endRow && col >= startCol && col <= endCol) {
-                    const topLeft = `${startCol}${startRow}`;
-                    if (!ws[topLeft]) ws[topLeft] = { t: 's', v: valor };
+                const startColNum = merge.s.c;
+                const endColNum = merge.e.c;
+                if (row >= startRow && row <= endRow && colIndex >= startColNum && colIndex <= endColNum) {
+                    const topLeftCol = String.fromCharCode(65 + startColNum);
+                    const topLeft = `${topLeftCol}${startRow}`;
+                    if (!ws[topLeft]) ws[topLeft] = { t: 'n', v: valor };
                     else ws[topLeft].v = valor;
-                    console.log(`Escrita mesclada: ${cellRef} -> ${topLeft} = ${valor}`);
+                    console.log(`Mesclada: ${cellRef} -> ${topLeft} = ${valor}`);
                     return;
                 }
             }
         }
-        if (!ws[cellRef]) ws[cellRef] = { t: 's', v: valor };
+        // Escrita direta (número em vez de string para preservar formato)
+        if (!ws[cellRef]) ws[cellRef] = { t: 'n', v: valor };
         else ws[cellRef].v = valor;
-        console.log(`Escrita direta: ${cellRef} = ${valor}`);
+        console.log(`Direta: ${cellRef} = ${valor}`);
     }
 
-    // ================= EXTRAÇÃO MELHORADA DO DECLIVE =================
+    // Extração de declive melhorada (já funciona)
     function extrairDecliveDoTexto(texto) {
-        // Estratégia 1: procurar por padrões como "0.123 dB/km" ou "0,123 dB/km"
         let match = texto.match(/(\d+(?:[.,]\d+)?)\s*dB\/km/i);
         if (match) return parseFloat(match[1].replace(',', '.'));
-        
-        // Estratégia 2: procurar por linhas que contenham "dB/Km" e capturar o número antes
         const linhas = texto.split('\n');
         for (let linha of linhas) {
             if (linha.match(/dB\/km/i)) {
@@ -173,24 +180,18 @@
                 if (numMatch) return parseFloat(numMatch[1].replace(',', '.'));
             }
         }
-        
-        // Estratégia 3: similar ao original python: linha começando com número, pegar o terceiro número (após distância)
         for (let linha of linhas) {
             if (/^\s*\d+\s/.test(linha)) {
                 const numeros = linha.match(/-?\d+(?:[.,]\d+)?/g);
                 if (numeros && numeros.length >= 4) {
-                    // Terceiro número (índice 2) costuma ser o declive
                     let val = parseFloat(numeros[2].replace(',', '.'));
                     if (!isNaN(val)) return val;
                 }
             }
         }
-        
-        // Estratégia 4: procurar por "Attenuation" ou "Perda"
         const attMatch = texto.match(/Attenuation[:\s]*(\d+(?:[.,]\d+)?)/i);
         if (attMatch) return parseFloat(attMatch[1].replace(',', '.'));
-        
-        return 0; // fallback
+        return 0;
     }
 
     async function extrairDadosPDF(file) {
@@ -211,7 +212,6 @@
                     const bobina = bobinaMatch ? bobinaMatch[1] : null;
                     const dataMatch = fullText.match(/Data de impressão\s*:\s*(\d{2}\/\d{2}\/\d{4})/);
                     const data = dataMatch ? dataMatch[1] : '';
-                    
                     let distanciaFinal = 0;
                     const fimMatch = fullText.match(/Fim da Fibra m\s+([\d\.]+)/);
                     if (fimMatch) distanciaFinal = parseFloat(fimMatch[1]);
@@ -219,17 +219,12 @@
                         const distancias = [...fullText.matchAll(/(\d+\.\d+)\s*m/g)].map(m => parseFloat(m[1]));
                         if (distancias.length) distanciaFinal = Math.max(...distancias);
                     }
-                    
-                    // Usa a função melhorada para extrair o declive
                     let declive = extrairDecliveDoTexto(fullText);
-                    
                     let lote = '', tipo = '';
                     const ident = fullText.match(/Ident\. Cabo.*?:\s*([A-Z0-9]+)\s+([A-Z0-9]+)/i);
                     if (ident) { lote = ident[1]; tipo = ident[2]; }
-                    
                     const fibraMatch = nome.match(/F(\d+)/i);
                     const fibra = fibraMatch ? parseInt(fibraMatch[1]) : 0;
-                    
                     console.log(`Extraído: fibra ${fibra}, declive ${declive}`);
                     resolve({ bobina, data, distancia_final: distanciaFinal, declive, lote, tipo, fibra });
                 } catch (err) { reject(err); }
@@ -239,15 +234,16 @@
         });
     }
 
-    // ================= GERAR EXCEL (MANTÉM O MODELO) =================
+    // Função que gera o Excel e retorna o buffer (ou faz download direto)
     async function gerarExcelBuffer(dadosPorFibra, modeloFile, comprimentoBobina, operador) {
         if (!dadosPorFibra.length) return null;
         const primeiro = dadosPorFibra[0];
         let bobina = primeiro.bobina || `ERRO_${Date.now()}`;
         const nomeSaida = `BOBINA_${bobina}.xlsx`;
         
+        // Lê o modelo com cellStyles para preservar mesclagens e estilos
         const modeloBuffer = await modeloFile.arrayBuffer();
-        const workbook = XLSX.read(modeloBuffer, { type: 'array' });
+        const workbook = XLSX.read(modeloBuffer, { type: 'array', cellStyles: true });
         const sheetName = workbook.SheetNames[0];
         const ws = workbook.Sheets[sheetName];
         
@@ -272,14 +268,17 @@
             linha++;
         }
         
+        // Após escrever, podemos fazer uma verificação rápida
+        console.log("Verificando E15 após escrita:", ws["E15"]?.v);
+        
         const newWb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(newWb, ws, sheetName);
         const wbout = XLSX.write(newWb, { bookType: 'xlsx', type: 'array' });
         return { nome: nomeSaida, buffer: wbout };
     }
 
-    // ================= PROCESSAMENTO PRINCIPAL =================
-    async function processar() {
+    // Função para processar todas as subpastas e gerar ZIP
+    async function processar(apenasTeste = false) {
         if (state.executando) { setStatus("Processamento já em andamento...", "warning"); return; }
         const operador = DOM.operador.value.trim();
         const comprimentoVal = parseFloat(DOM.comprimento.value);
@@ -289,7 +288,8 @@
         if (!state.modeloFile) { setStatus("Carregue o modelo Excel", "error"); return; }
         
         state.executando = true;
-        DOM.btnGerar.disabled = true;
+        DOM.btnGerarZip.disabled = true;
+        DOM.btnTestar.disabled = true;
         setStatus("📡 Iniciando varredura OTDR...", "info");
         
         try {
@@ -323,32 +323,45 @@
                 if (dadosFibras.length) {
                     const { nome, buffer } = await gerarExcelBuffer(dadosFibras, state.modeloFile, comprimentoVal, operador);
                     arquivosGerados.push({ nome, buffer });
-                } else {
-                    console.warn(`Nenhum dado extraído para a subpasta ${subpasta}`);
+                    console.log(`Arquivo gerado: ${nome}`);
                 }
                 processadas++;
                 updateProgress(processadas, subpastas.length, `Processando ${subpasta} (${processadas}/${subpastas.length})`);
             }
             
-            if (arquivosGerados.length === 0) throw new Error("Nenhum arquivo Excel foi gerado. Verifique os PDFs e o modelo.");
+            if (arquivosGerados.length === 0) throw new Error("Nenhum arquivo Excel foi gerado.");
             
-            setStatus("📦 Compactando arquivos...", "info");
-            const zip = new JSZip();
-            for (const arq of arquivosGerados) {
-                zip.file(arq.nome, arq.buffer);
+            if (apenasTeste) {
+                // Baixa apenas o primeiro arquivo
+                const primeiroArq = arquivosGerados[0];
+                const blob = new Blob([primeiroArq.buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                link.download = primeiroArq.nome;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                setStatus(`✅ Teste: Arquivo ${primeiroArq.nome} baixado. Verifique se os dados aparecem.`, "success");
+            } else {
+                setStatus("📦 Compactando arquivos...", "info");
+                const zip = new JSZip();
+                for (const arq of arquivosGerados) {
+                    zip.file(arq.nome, arq.buffer);
+                }
+                const zipBlob = await zip.generateAsync({ type: "blob" });
+                const hoje = new Date().toISOString().slice(0,10);
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(zipBlob);
+                link.href = url;
+                link.download = `RELATORIOS_OTDR_${hoje}.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                setStatus(`✅ FINALIZADO! ${arquivosGerados.length} planilhas geradas e compactadas em ZIP.`, "success");
             }
-            const zipBlob = await zip.generateAsync({ type: "blob" });
-            const hoje = new Date().toISOString().slice(0,10);
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(zipBlob);
-            link.href = url;
-            link.download = `RELATORIOS_OTDR_${hoje}.zip`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            setStatus(`✅ FINALIZADO! ${arquivosGerados.length} planilhas geradas e compactadas em ZIP.`, "success");
             DOM.metricStatus.innerHTML = '✅ CONCLUÍDO';
         } catch (err) {
             setStatus(`❌ Erro: ${err.message}`, "error");
@@ -356,11 +369,12 @@
             console.error(err);
         } finally {
             state.executando = false;
-            DOM.btnGerar.disabled = false;
+            DOM.btnGerarZip.disabled = false;
+            DOM.btnTestar.disabled = false;
         }
     }
     
-    // ================= SELETORES =================
+    // Configurar seletores
     function setupSelectors() {
         const baseInput = document.createElement('input');
         baseInput.type = 'file';
@@ -395,7 +409,8 @@
     }
     
     setupSelectors();
-    DOM.btnGerar.onclick = processar;
+    DOM.btnGerarZip.onclick = () => processar(false);
+    DOM.btnTestar.onclick = () => processar(true);
 </script>
 </body>
 </html>
