@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FiberOTDR | Sistema de Pré-Lançamento de Fibra Óptica</title>
+    <title>FiberOTDR | Pré-Lançamento de Fibra Óptica</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -11,14 +11,7 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: #050811;
-            color: #E8EDF5;
-            position: relative;
-            overflow-x: hidden;
-        }
-        /* Fundo high-tech */
+        body { font-family: 'Space Grotesk', sans-serif; background: #050811; color: #E8EDF5; position: relative; overflow-x: hidden; }
         .tech-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
         .data-grid { position: absolute; width: 100%; height: 100%; background-image: linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px); background-size: 35px 35px; animation: gridPulse 4s ease-in-out infinite; }
         @keyframes gridPulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.6; } }
@@ -85,99 +78,30 @@
     <div class="header">
         <div class="logo-area"><div class="logo-icon"><i class="fas fa-fiber-optic"></i></div><div class="logo-text">FIBEROTDR<span class="logo-badge">TELECOM</span></div></div>
         <h1>Pré-Lançamento de Redes Ópticas</h1>
-        <div class="fiber-stats">
-            <div class="fiber-stat"><i class="fas fa-charging-station"></i> OTDR Analysis</div>
-            <div class="fiber-stat"><i class="fas fa-waveform"></i> Reflectometry</div>
-            <div class="fiber-stat"><i class="fas fa-network-wired"></i> Intelligent Routing</div>
-        </div>
+        <div class="fiber-stats"><div class="fiber-stat"><i class="fas fa-charging-station"></i> OTDR Analysis</div><div class="fiber-stat"><i class="fas fa-waveform"></i> Reflectometry</div><div class="fiber-stat"><i class="fas fa-network-wired"></i> Intelligent Routing</div></div>
     </div>
     <div class="dashboard-grid">
-        <div class="card">
-            <div class="card-header"><i class="fas fa-user-astronaut"></i><h3>Operador & Parâmetros</h3></div>
-            <div class="card-body">
-                <div class="form-group"><label><i class="fas fa-id-card"></i> Nome do Operador</label><div class="input-container"><input type="text" id="operadorNome" placeholder="Ex: João Silva - Equipe OTDR"></div></div>
-                <div class="form-group"><label><i class="fas fa-ruler"></i> Comprimento da Bobina (metros)</label><div class="input-container"><input type="number" id="comprimentoBobina" placeholder="Ex: 500" step="any" value="500"></div></div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header"><i class="fas fa-folder-tree"></i><h3>Fontes de Dados</h3></div>
-            <div class="card-body">
-                <div class="form-group"><label><i class="fas fa-inbox"></i> Pasta PRE-LANÇAMENTO (com subpastas)</label><div class="input-container"><input type="text" id="pastaBase" readonly placeholder="Nenhuma pasta selecionada" class="fake-input"><button class="btn-ghost" id="btnSelectBase"><i class="fas fa-folder-open"></i> Selecionar</button></div></div>
-                <div class="form-group"><label><i class="fas fa-file-excel"></i> Modelo Excel (.xlsx)</label><div class="input-container"><input type="text" id="modeloPath" readonly placeholder="Nenhum arquivo selecionado" class="fake-input"><button class="btn-ghost" id="btnSelectModelo"><i class="fas fa-upload"></i> Carregar</button></div></div>
-            </div>
-        </div>
+        <div class="card"><div class="card-header"><i class="fas fa-user-astronaut"></i><h3>Operador & Parâmetros</h3></div><div class="card-body"><div class="form-group"><label><i class="fas fa-id-card"></i> Nome do Operador</label><div class="input-container"><input type="text" id="operadorNome" placeholder="Ex: João Silva - Equipe OTDR"></div></div><div class="form-group"><label><i class="fas fa-ruler"></i> Comprimento da Bobina (metros)</label><div class="input-container"><input type="number" id="comprimentoBobina" placeholder="Ex: 500" step="any" value="500"></div></div></div></div>
+        <div class="card"><div class="card-header"><i class="fas fa-folder-tree"></i><h3>Fontes de Dados</h3></div><div class="card-body"><div class="form-group"><label><i class="fas fa-inbox"></i> Pasta PRE-LANÇAMENTO (com subpastas)</label><div class="input-container"><input type="text" id="pastaBase" readonly placeholder="Nenhuma pasta selecionada" class="fake-input"><button class="btn-ghost" id="btnSelectBase"><i class="fas fa-folder-open"></i> Selecionar</button></div></div><div class="form-group"><label><i class="fas fa-file-excel"></i> Modelo Excel (.xlsx)</label><div class="input-container"><input type="text" id="modeloPath" readonly placeholder="Nenhum arquivo selecionado" class="fake-input"><button class="btn-ghost" id="btnSelectModelo"><i class="fas fa-upload"></i> Carregar</button></div></div></div></div>
     </div>
     <div class="action-card"><button class="btn-primary" id="btnGerar"><i class="fas fa-play-circle"></i> PROCESSAR E GERAR ZIP <i class="fas fa-file-archive"></i></button></div>
-    <div class="progress-card">
-        <div class="progress-header"><span><i class="fas fa-charging-station"></i> Monitor</span><span id="progressPercent">0%</span></div>
-        <div class="progress-bar-wrapper"><div class="progress-fill" id="progressFill"></div></div>
-        <div id="progressText" style="font-size:0.7rem;color:#5F7F9E;">Aguardando início</div>
-        <div class="status-area" id="statusArea"><i class="fas fa-info-circle"></i> Configure e clique em PROCESSAR.</div>
-        <div class="metrics">
-            <div class="metric-item"><div class="metric-label"><i class="fas fa-layer-group"></i> Pastas</div><div class="metric-value" id="metricFolders">0</div></div>
-            <div class="metric-item"><div class="metric-label"><i class="fas fa-file-pdf"></i> PDFs</div><div class="metric-value" id="metricPDFs">0</div></div>
-            <div class="metric-item"><div class="metric-label"><i class="fas fa-microchip"></i> Status</div><div class="metric-value" id="metricStatus">⚫ IDLE</div></div>
-        </div>
-    </div>
+    <div class="progress-card"><div class="progress-header"><span><i class="fas fa-charging-station"></i> Monitor</span><span id="progressPercent">0%</span></div><div class="progress-bar-wrapper"><div class="progress-fill" id="progressFill"></div></div><div id="progressText" style="font-size:0.7rem;color:#5F7F9E;">Aguardando início</div><div class="status-area" id="statusArea"><i class="fas fa-info-circle"></i> Configure e clique em PROCESSAR.</div><div class="metrics"><div class="metric-item"><div class="metric-label"><i class="fas fa-layer-group"></i> Pastas</div><div class="metric-value" id="metricFolders">0</div></div><div class="metric-item"><div class="metric-label"><i class="fas fa-file-pdf"></i> PDFs</div><div class="metric-value" id="metricPDFs">0</div></div><div class="metric-item"><div class="metric-label"><i class="fas fa-microchip"></i> Status</div><div class="metric-value" id="metricStatus">⚫ IDLE</div></div></div></div>
     <div class="footer-note"><span><i class="fas fa-shield-alt"></i> Processamento local</span><span><i class="fas fa-file-archive"></i> Resultados em um único ZIP</span></div>
 </div>
 
 <script>
-    // Configuração do PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
-    // ========== FUNDO HIGH-TECH ==========
-    function createTechBackground() {
+    // Fundo high-tech
+    (function createTechBackground() {
         const container = document.getElementById('techBg');
-        for (let i = 0; i < 20; i++) {
-            const line = document.createElement('div');
-            line.className = 'fiber-line';
-            line.style.top = Math.random() * 100 + '%';
-            line.style.left = Math.random() * 100 + '%';
-            line.style.width = 150 + Math.random() * 250 + 'px';
-            line.style.animationDelay = Math.random() * 5 + 's';
-            container.appendChild(line);
-        }
-        const positions = [];
-        for (let i = 0; i < 30; i++) {
-            const node = document.createElement('div');
-            node.className = 'network-node';
-            const x = Math.random() * 100, y = Math.random() * 100;
-            node.style.left = x + '%';
-            node.style.top = y + '%';
-            container.appendChild(node);
-            positions.push({x,y});
-        }
-        for (let i = 0; i < positions.length; i++) {
-            for (let j = i+1; j < positions.length; j++) {
-                const dx = positions[i].x - positions[j].x;
-                const dy = positions[i].y - positions[j].y;
-                const dist = Math.hypot(dx, dy);
-                if (dist < 12 && dist > 4) {
-                    const line = document.createElement('div');
-                    line.className = 'network-line';
-                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                    line.style.width = dist + '%';
-                    line.style.left = positions[i].x + '%';
-                    line.style.top = positions[i].y + '%';
-                    line.style.transform = `rotate(${angle}deg)`;
-                    container.appendChild(line);
-                }
-            }
-        }
-        for (let i = 0; i < 40; i++) {
-            const bin = document.createElement('div');
-            bin.className = 'binary-rain';
-            bin.textContent = ['10','01','110','101','011','1001'][Math.floor(Math.random()*6)] + ' ';
-            bin.style.left = Math.random() * 100 + '%';
-            bin.style.animationDelay = Math.random() * 8 + 's';
-            bin.style.animationDuration = 6 + Math.random() * 10 + 's';
-            container.appendChild(bin);
-        }
-    }
-    createTechBackground();
+        for (let i=0;i<20;i++) { let l=document.createElement('div'); l.className='fiber-line'; l.style.top=Math.random()*100+'%'; l.style.left=Math.random()*100+'%'; l.style.width=150+Math.random()*250+'px'; l.style.animationDelay=Math.random()*5+'s'; container.appendChild(l); }
+        const pos=[];
+        for(let i=0;i<30;i++) { let n=document.createElement('div'); n.className='network-node'; let x=Math.random()*100,y=Math.random()*100; n.style.left=x+'%'; n.style.top=y+'%'; container.appendChild(n); pos.push({x,y}); }
+        for(let i=0;i<pos.length;i++) for(let j=i+1;j<pos.length;j++) { let dx=pos[i].x-pos[j].x, dy=pos[i].y-pos[j].y, dist=Math.hypot(dx,dy); if(dist<12 && dist>4) { let ln=document.createElement('div'); ln.className='network-line'; let ang=Math.atan2(dy,dx)*180/Math.PI; ln.style.width=dist+'%'; ln.style.left=pos[i].x+'%'; ln.style.top=pos[i].y+'%'; ln.style.transform=`rotate(${ang}deg)`; container.appendChild(ln); } }
+        for(let i=0;i<40;i++) { let b=document.createElement('div'); b.className='binary-rain'; b.textContent=['10','01','110','101','011','1001'][Math.floor(Math.random()*6)]+' '; b.style.left=Math.random()*100+'%'; b.style.animationDelay=Math.random()*8+'s'; b.style.animationDuration=6+Math.random()*10+'s'; container.appendChild(b); }
+    })();
 
-    // ========== ESTADO GLOBAL ==========
     let state = { executando: false, pastaBaseFiles: null, modeloFile: null };
     const DOM = {
         operador: document.getElementById('operadorNome'),
@@ -194,30 +118,31 @@
         metricStatus: document.getElementById('metricStatus')
     };
 
-    function setStatus(msg, type = 'info') {
-        const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', warning: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    function setStatus(msg, type='info') {
+        const icons={success:'fa-check-circle', error:'fa-exclamation-triangle', warning:'fa-exclamation-circle', info:'fa-info-circle'};
         DOM.statusArea.innerHTML = `<i class="fas ${icons[type]}"></i> ${msg}`;
         DOM.statusArea.className = 'status-area';
-        if (type === 'success') DOM.statusArea.classList.add('status-success');
-        else if (type === 'error') DOM.statusArea.classList.add('status-error');
-        else if (type === 'warning') DOM.statusArea.classList.add('status-warning');
+        if(type==='success') DOM.statusArea.classList.add('status-success');
+        else if(type==='error') DOM.statusArea.classList.add('status-error');
+        else if(type==='warning') DOM.statusArea.classList.add('status-warning');
     }
-
-    function updateProgress(current, total, detail = '') {
-        const percent = total === 0 ? 0 : (current / total) * 100;
-        DOM.progressFill.style.width = percent + '%';
-        DOM.progressPercent.innerText = Math.round(percent) + '%';
+    function updateProgress(current,total,detail='') {
+        let percent = total===0 ? 0 : (current/total)*100;
+        DOM.progressFill.style.width = percent+'%';
+        DOM.progressPercent.innerText = Math.round(percent)+'%';
         DOM.progressText.innerText = detail || `Processando ${current} de ${total} pastas`;
     }
 
-    // ========== CÉLULAS MESCLADAS (FIEL AO ORIGINAL) ==========
+    // ================= FUNÇÃO FIEL AO ORIGINAL (PYTHON) =================
+    // Escreve em célula mesclada: encontra a célula superior esquerda do merge
     function escreverEmMesclada(ws, cellRef, valor) {
         const match = cellRef.match(/([A-Z]+)(\d+)/);
         if (!match) return;
         const col = match[1];
         const row = parseInt(match[2]);
         if (ws['!merges']) {
-            for (const merge of ws['!merges']) {
+            for (let merge of ws['!merges']) {
+                // merge.s = {c:col_inicial, r:linha_inicial}, merge.e = {c:col_final, r:linha_final}
                 const startRow = merge.s.r + 1;
                 const endRow = merge.e.r + 1;
                 const startCol = String.fromCharCode(65 + merge.s.c);
@@ -226,15 +151,18 @@
                     const topLeft = `${startCol}${startRow}`;
                     if (!ws[topLeft]) ws[topLeft] = { t: 's', v: valor };
                     else ws[topLeft].v = valor;
+                    console.log(`Escrita mesclada: ${cellRef} -> topLeft ${topLeft} = ${valor}`);
                     return;
                 }
             }
         }
+        // Se não estiver mesclada, escreve diretamente
         if (!ws[cellRef]) ws[cellRef] = { t: 's', v: valor };
         else ws[cellRef].v = valor;
+        console.log(`Escrita direta: ${cellRef} = ${valor}`);
     }
 
-    // ========== EXTRAIR DADOS DO PDF ==========
+    // Extração de dados do PDF (igual ao original)
     async function extrairDadosPDF(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -277,23 +205,26 @@
         });
     }
 
-    // ========== PREENCHER E SALVAR CADA EXCEL (retorna o arquivo como ArrayBuffer) ==========
+    // Preenche o Excel e retorna o buffer do arquivo (ArrayBuffer)
     async function gerarExcelBuffer(dadosPorFibra, modeloFile, comprimentoBobina, operador) {
         if (!dadosPorFibra.length) return null;
         const primeiro = dadosPorFibra[0];
         let bobina = primeiro.bobina || `ERRO_${Date.now()}`;
         const nomeSaida = `BOBINA_${bobina}.xlsx`;
         
+        // Carrega o modelo Excel completo (com todas as mesclagens e formatações)
         const modeloBuffer = await modeloFile.arrayBuffer();
         const workbook = XLSX.read(modeloBuffer, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const ws = workbook.Sheets[sheetName];
         
+        // Dados para preencher
         const data = primeiro.data || "";
         const lote = primeiro.lote || "";
         const tipo = primeiro.tipo || "";
         const metragemTotal = Math.floor(primeiro.distancia_final - comprimentoBobina);
         
+        // Escrita idêntica ao original
         escreverEmMesclada(ws, "A8", `BOBINA ${bobina}`);
         escreverEmMesclada(ws, "E8", data);
         escreverEmMesclada(ws, "G11", metragemTotal);
@@ -303,6 +234,7 @@
         const comentario = `Comentários: Os Teste foram executados nas direções AB e BA, utilizando Bobina de Testes de ${Math.floor(comprimentoBobina)} metros.`;
         escreverEmMesclada(ws, "A63", comentario);
         
+        // Ordena as fibras e escreve os declives na coluna E a partir da linha 15
         dadosPorFibra.sort((a,b) => a.fibra - b.fibra);
         let linha = 15;
         for (const item of dadosPorFibra) {
@@ -310,13 +242,14 @@
             linha++;
         }
         
+        // Salva o workbook modificado
         const newWb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(newWb, ws, sheetName);
         const wbout = XLSX.write(newWb, { bookType: 'xlsx', type: 'array' });
         return { nome: nomeSaida, buffer: wbout };
     }
 
-    // ========== PROCESSAMENTO PRINCIPAL ==========
+    // ================= PROCESSAMENTO PRINCIPAL =================
     async function processar() {
         if (state.executando) { setStatus("Processamento já em andamento...", "warning"); return; }
         const operador = DOM.operador.value.trim();
@@ -347,7 +280,7 @@
             DOM.metricPDFs.innerText = totalPDFs;
             if (subpastas.length === 0) throw new Error("Nenhuma subpasta com PDF encontrada.");
             
-            const arquivosGerados = []; // { nome, buffer }
+            const arquivosGerados = [];
             let processadas = 0;
             for (const subpasta of subpastas) {
                 const pdfFiles = mapPorSubpasta.get(subpasta);
@@ -356,19 +289,22 @@
                     try {
                         const dados = await extrairDadosPDF(pdf);
                         dadosFibras.push(dados);
+                        console.log(`PDF ${pdf.name} extraído: fibra ${dados.fibra}, declive ${dados.declive}`);
                     } catch (e) { console.warn(`Erro no PDF ${pdf.name}:`, e); }
                 }
                 if (dadosFibras.length) {
                     const { nome, buffer } = await gerarExcelBuffer(dadosFibras, state.modeloFile, comprimentoVal, operador);
                     arquivosGerados.push({ nome, buffer });
+                    console.log(`Arquivo gerado: ${nome}`);
+                } else {
+                    console.warn(`Nenhum dado extraído para a subpasta ${subpasta}`);
                 }
                 processadas++;
                 updateProgress(processadas, subpastas.length, `Processando ${subpasta} (${processadas}/${subpastas.length})`);
             }
             
-            if (arquivosGerados.length === 0) throw new Error("Nenhum arquivo Excel foi gerado.");
+            if (arquivosGerados.length === 0) throw new Error("Nenhum arquivo Excel foi gerado. Verifique os PDFs e o modelo.");
             
-            // Compactar todos em um ZIP
             setStatus("📦 Compactando arquivos...", "info");
             const zip = new JSZip();
             for (const arq of arquivosGerados) {
@@ -397,7 +333,7 @@
         }
     }
     
-    // ========== SELETORES ==========
+    // Configurar seletores de arquivo/pasta
     function setupSelectors() {
         const baseInput = document.createElement('input');
         baseInput.type = 'file';
