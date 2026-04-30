@@ -92,7 +92,7 @@
 <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
-    // Fundo high-tech
+    // Fundo high-tech (mesmo de antes)
     (function createTechBackground() {
         const container = document.getElementById('techBg');
         for (let i=0;i<20;i++) { let l=document.createElement('div'); l.className='fiber-line'; l.style.top=Math.random()*100+'%'; l.style.left=Math.random()*100+'%'; l.style.width=150+Math.random()*250+'px'; l.style.animationDelay=Math.random()*5+'s'; container.appendChild(l); }
@@ -133,8 +133,7 @@
         DOM.progressText.innerText = detail || `Processando ${current} de ${total} pastas`;
     }
 
-    // ================= FUNÇÃO FIEL AO ORIGINAL (PYTHON) =================
-    // Escreve em célula mesclada: encontra a célula superior esquerda do merge
+    // ================= FUNÇÃO DE ESCRITA EM CÉLULAS MESCLADAS =================
     function escreverEmMesclada(ws, cellRef, valor) {
         const match = cellRef.match(/([A-Z]+)(\d+)/);
         if (!match) return;
@@ -142,7 +141,6 @@
         const row = parseInt(match[2]);
         if (ws['!merges']) {
             for (let merge of ws['!merges']) {
-                // merge.s = {c:col_inicial, r:linha_inicial}, merge.e = {c:col_final, r:linha_final}
                 const startRow = merge.s.r + 1;
                 const endRow = merge.e.r + 1;
                 const startCol = String.fromCharCode(65 + merge.s.c);
@@ -151,18 +149,50 @@
                     const topLeft = `${startCol}${startRow}`;
                     if (!ws[topLeft]) ws[topLeft] = { t: 's', v: valor };
                     else ws[topLeft].v = valor;
-                    console.log(`Escrita mesclada: ${cellRef} -> topLeft ${topLeft} = ${valor}`);
+                    console.log(`Escrita mesclada: ${cellRef} -> ${topLeft} = ${valor}`);
                     return;
                 }
             }
         }
-        // Se não estiver mesclada, escreve diretamente
         if (!ws[cellRef]) ws[cellRef] = { t: 's', v: valor };
         else ws[cellRef].v = valor;
         console.log(`Escrita direta: ${cellRef} = ${valor}`);
     }
 
-    // Extração de dados do PDF (igual ao original)
+    // ================= EXTRAÇÃO MELHORADA DO DECLIVE =================
+    function extrairDecliveDoTexto(texto) {
+        // Estratégia 1: procurar por padrões como "0.123 dB/km" ou "0,123 dB/km"
+        let match = texto.match(/(\d+(?:[.,]\d+)?)\s*dB\/km/i);
+        if (match) return parseFloat(match[1].replace(',', '.'));
+        
+        // Estratégia 2: procurar por linhas que contenham "dB/Km" e capturar o número antes
+        const linhas = texto.split('\n');
+        for (let linha of linhas) {
+            if (linha.match(/dB\/km/i)) {
+                const numMatch = linha.match(/(\d+(?:[.,]\d+)?)/);
+                if (numMatch) return parseFloat(numMatch[1].replace(',', '.'));
+            }
+        }
+        
+        // Estratégia 3: similar ao original python: linha começando com número, pegar o terceiro número (após distância)
+        for (let linha of linhas) {
+            if (/^\s*\d+\s/.test(linha)) {
+                const numeros = linha.match(/-?\d+(?:[.,]\d+)?/g);
+                if (numeros && numeros.length >= 4) {
+                    // Terceiro número (índice 2) costuma ser o declive
+                    let val = parseFloat(numeros[2].replace(',', '.'));
+                    if (!isNaN(val)) return val;
+                }
+            }
+        }
+        
+        // Estratégia 4: procurar por "Attenuation" ou "Perda"
+        const attMatch = texto.match(/Attenuation[:\s]*(\d+(?:[.,]\d+)?)/i);
+        if (attMatch) return parseFloat(attMatch[1].replace(',', '.'));
+        
+        return 0; // fallback
+    }
+
     async function extrairDadosPDF(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -177,8 +207,11 @@
                         fullText += textContent.items.map(item => item.str).join(' ') + '\n';
                     }
                     const nome = file.name;
-                    const bobina = (nome.match(/B-(\d+)/i) || [])[1] || null;
-                    const data = (fullText.match(/Data de impressão\s*:\s*(\d{2}\/\d{2}\/\d{4})/) || [])[1] || '';
+                    const bobinaMatch = nome.match(/B-(\d+)/i);
+                    const bobina = bobinaMatch ? bobinaMatch[1] : null;
+                    const dataMatch = fullText.match(/Data de impressão\s*:\s*(\d{2}\/\d{2}\/\d{4})/);
+                    const data = dataMatch ? dataMatch[1] : '';
+                    
                     let distanciaFinal = 0;
                     const fimMatch = fullText.match(/Fim da Fibra m\s+([\d\.]+)/);
                     if (fimMatch) distanciaFinal = parseFloat(fimMatch[1]);
@@ -186,17 +219,18 @@
                         const distancias = [...fullText.matchAll(/(\d+\.\d+)\s*m/g)].map(m => parseFloat(m[1]));
                         if (distancias.length) distanciaFinal = Math.max(...distancias);
                     }
-                    let declive = 0;
-                    for (const linha of fullText.split('\n')) {
-                        if (/^\s*\d+\s/.test(linha)) {
-                            const nums = linha.match(/-?\d+\.\d+/g);
-                            if (nums && nums.length >= 4) { declive = parseFloat(nums[2]); break; }
-                        }
-                    }
+                    
+                    // Usa a função melhorada para extrair o declive
+                    let declive = extrairDecliveDoTexto(fullText);
+                    
                     let lote = '', tipo = '';
                     const ident = fullText.match(/Ident\. Cabo.*?:\s*([A-Z0-9]+)\s+([A-Z0-9]+)/i);
                     if (ident) { lote = ident[1]; tipo = ident[2]; }
-                    const fibra = (nome.match(/F(\d+)/i) || [])[1] ? parseInt((nome.match(/F(\d+)/i))[1]) : 0;
+                    
+                    const fibraMatch = nome.match(/F(\d+)/i);
+                    const fibra = fibraMatch ? parseInt(fibraMatch[1]) : 0;
+                    
+                    console.log(`Extraído: fibra ${fibra}, declive ${declive}`);
                     resolve({ bobina, data, distancia_final: distanciaFinal, declive, lote, tipo, fibra });
                 } catch (err) { reject(err); }
             };
@@ -205,36 +239,32 @@
         });
     }
 
-    // Preenche o Excel e retorna o buffer do arquivo (ArrayBuffer)
+    // ================= GERAR EXCEL (MANTÉM O MODELO) =================
     async function gerarExcelBuffer(dadosPorFibra, modeloFile, comprimentoBobina, operador) {
         if (!dadosPorFibra.length) return null;
         const primeiro = dadosPorFibra[0];
         let bobina = primeiro.bobina || `ERRO_${Date.now()}`;
         const nomeSaida = `BOBINA_${bobina}.xlsx`;
         
-        // Carrega o modelo Excel completo (com todas as mesclagens e formatações)
         const modeloBuffer = await modeloFile.arrayBuffer();
         const workbook = XLSX.read(modeloBuffer, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const ws = workbook.Sheets[sheetName];
         
-        // Dados para preencher
         const data = primeiro.data || "";
         const lote = primeiro.lote || "";
         const tipo = primeiro.tipo || "";
         const metragemTotal = Math.floor(primeiro.distancia_final - comprimentoBobina);
         
-        // Escrita idêntica ao original
         escreverEmMesclada(ws, "A8", `BOBINA ${bobina}`);
         escreverEmMesclada(ws, "E8", data);
         escreverEmMesclada(ws, "G11", metragemTotal);
         escreverEmMesclada(ws, "G10", lote);
         escreverEmMesclada(ws, "C9", tipo);
         escreverEmMesclada(ws, "A67", operador);
-        const comentario = `Comentários: Os Teste foram executados nas direções AB e BA, utilizando Bobina de Testes de ${Math.floor(comprimentoBobina)} metros.`;
+        const comentario = `Comentários: Os Testes foram executados nas direções AB e BA, utilizando Bobina de Testes de ${Math.floor(comprimentoBobina)} metros.`;
         escreverEmMesclada(ws, "A63", comentario);
         
-        // Ordena as fibras e escreve os declives na coluna E a partir da linha 15
         dadosPorFibra.sort((a,b) => a.fibra - b.fibra);
         let linha = 15;
         for (const item of dadosPorFibra) {
@@ -242,7 +272,6 @@
             linha++;
         }
         
-        // Salva o workbook modificado
         const newWb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(newWb, ws, sheetName);
         const wbout = XLSX.write(newWb, { bookType: 'xlsx', type: 'array' });
@@ -289,13 +318,11 @@
                     try {
                         const dados = await extrairDadosPDF(pdf);
                         dadosFibras.push(dados);
-                        console.log(`PDF ${pdf.name} extraído: fibra ${dados.fibra}, declive ${dados.declive}`);
                     } catch (e) { console.warn(`Erro no PDF ${pdf.name}:`, e); }
                 }
                 if (dadosFibras.length) {
                     const { nome, buffer } = await gerarExcelBuffer(dadosFibras, state.modeloFile, comprimentoVal, operador);
                     arquivosGerados.push({ nome, buffer });
-                    console.log(`Arquivo gerado: ${nome}`);
                 } else {
                     console.warn(`Nenhum dado extraído para a subpasta ${subpasta}`);
                 }
@@ -333,7 +360,7 @@
         }
     }
     
-    // Configurar seletores de arquivo/pasta
+    // ================= SELETORES =================
     function setupSelectors() {
         const baseInput = document.createElement('input');
         baseInput.type = 'file';
